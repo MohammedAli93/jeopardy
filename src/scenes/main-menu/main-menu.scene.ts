@@ -32,8 +32,10 @@ export class MainMenuScene extends Phaser.Scene {
     container.add(buttonSinglePlayer);
     container.add(buttonMultiplayer);
     container.add(copyrights);
+    container.setAlpha(0);
     this.tweens.add({
       targets: container,
+      delay: 2_000,
       props: {
         alpha: { from: 0, to: 1 },
         scale: { from: 1.5, to: 1 },
@@ -42,8 +44,10 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Title
     const title = this.add.image(width / 2, height / 2, "scenes.main-menu.title");
+    title.setAlpha(0);
     this.tweens.add({
       targets: title,
+      delay: 2_000,
       props: {
         alpha: { from: 0, to: 1 },
         scale: { from: 0, to: 1 },
