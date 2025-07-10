@@ -8,7 +8,8 @@ export class LoadingScene extends Phaser.Scene {
     this.load.setPath("assets/scenes/main-menu");
     this.load.setPrefix("scenes.main-menu.");
 
-    this.load.image("background", "background.png");
+    // this.load.image("background", "background.png");
+    this.load.video("background-video", "background.mp4", true);
     this.load.image("title-background", "title-background.png");
     this.load.image("title", "title.png");
     this.load.image("button-single-player", "button-single-player.png");

@@ -5,9 +5,14 @@ export class MainMenuScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
+    const VIDEO_WIDTH = 1280;
+    const VIDEO_HEIGHT = 720;
 
     // Background
-    this.add.image(width / 2, height / 2, "scenes.main-menu.background");
+    // this.add.image(width / 2, height / 2, "scenes.main-menu.background");
+    const video = this.add.video(width / 2, height / 2, "scenes.main-menu.background-video");
+    video.setScale(Math.max(width / VIDEO_WIDTH, height / VIDEO_HEIGHT));
+    video.play(true);
 
     // Title Background
     const container = this.add.container(width / 2, height / 2);
@@ -22,7 +27,6 @@ export class MainMenuScene extends Phaser.Scene {
       titleBackground.x + buttonMultiplayer.displayWidth / 2 + 20,
       titleBackground.y + titleBackground.displayHeight / 2 - buttonMultiplayer.displayHeight - 50
     );
-    console.log(titleBackground.displayHeight)
     const copyrights = this.add.image(0, titleBackground.y + titleBackground.displayHeight / 2 - 50, "scenes.main-menu.copyrights");
     container.add(titleBackground);
     container.add(buttonSinglePlayer);
@@ -30,7 +34,6 @@ export class MainMenuScene extends Phaser.Scene {
     container.add(copyrights);
     this.tweens.add({
       targets: container,
-      duration: 500,
       props: {
         alpha: { from: 0, to: 1 },
         scale: { from: 1.5, to: 1 },
@@ -41,7 +44,6 @@ export class MainMenuScene extends Phaser.Scene {
     const title = this.add.image(width / 2, height / 2, "scenes.main-menu.title");
     this.tweens.add({
       targets: title,
-      duration: 500,
       props: {
         alpha: { from: 0, to: 1 },
         scale: { from: 0, to: 1 },
