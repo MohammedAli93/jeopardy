@@ -3,16 +3,17 @@ export class MainMenuScene extends Phaser.Scene {
     super("main-menu");
   }
 
-  create() {
+  async create() {
     const { width, height } = this.scale;
+    // For some reason I can't get the correct video size, so I'm hardcoding it.
     const VIDEO_WIDTH = 1280;
     const VIDEO_HEIGHT = 720;
 
     // Background
-    // this.add.image(width / 2, height / 2, "scenes.main-menu.background");
     const video = this.add.video(width / 2, height / 2, "scenes.main-menu.background-video");
     video.setScale(Math.max(width / VIDEO_WIDTH, height / VIDEO_HEIGHT));
-    video.play(true);
+    video.getFirstFrame();
+    video.setAlpha(0);
 
     // Title Background
     const container = this.add.container(width / 2, height / 2);
@@ -33,6 +34,25 @@ export class MainMenuScene extends Phaser.Scene {
     container.add(buttonMultiplayer);
     container.add(copyrights);
     container.setAlpha(0);
+
+    // Title
+    const title = this.add.image(width / 2, height / 2, "scenes.main-menu.title");
+    title.setAlpha(0);
+
+    // Animations
+    await new Promise((resolve) =>
+      this.tweens.add({
+        targets: video,
+        delay: 500,
+        props: {
+          alpha: { from: 0, to: 1 },
+        },
+        onComplete: resolve,
+      })
+    );
+
+    video.play(true);
+    
     this.tweens.add({
       targets: container,
       delay: 2_000,
@@ -42,9 +62,6 @@ export class MainMenuScene extends Phaser.Scene {
       }
     });
 
-    // Title
-    const title = this.add.image(width / 2, height / 2, "scenes.main-menu.title");
-    title.setAlpha(0);
     this.tweens.add({
       targets: title,
       delay: 2_000,
