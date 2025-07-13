@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Swiss 911 Ultra Compressed BT";
+  font-style: normal;
+  font-weight: normal;
+  src: local("fonts/Swiss 911 Ultra Compressed BT"),
+    url("fonts/Swiss 911 Ultra Compressed BT.woff") format("woff");
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

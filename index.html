@@ -7,6 +7,9 @@
     <title>Jeopardy</title>
   </head>
   <body>
+    <!-- Trick to guarantee that the font is loaded before Phaser starts to use it -->
+    <span style="font-family:'Swiss 911 Ultra Compressed BT'; position: absolute; left: -100%; top: -100%; z-index: -9999;">.</span>
+
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
   </body>
