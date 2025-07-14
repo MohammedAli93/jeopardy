@@ -6,6 +6,8 @@ import RexUIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 import { LoadingScene } from "./scenes/loading/loading.scene";
 import { MainMenuScene } from "./scenes/main-menu/main-menu.scene";
 import { GameScene } from "./scenes/game/game.scene";
+import { ChooseQuestionScene } from "./scenes/choose-question/choose-question.scene";
+import { ReplyQuestionScene } from "./scenes/reply-question/reply-question.scene";
 
 document.addEventListener("DOMContentLoaded", () => {
   const config: Phaser.Types.Core.GameConfig = {
@@ -17,7 +19,13 @@ document.addEventListener("DOMContentLoaded", () => {
       width: 1920,
       height: 1080,
     },
-    scene: [LoadingScene, MainMenuScene, GameScene],
+    scene: [
+      LoadingScene,
+      MainMenuScene,
+      GameScene,
+      ChooseQuestionScene,
+      ReplyQuestionScene,
+    ],
     plugins: {
       scene: [
         {

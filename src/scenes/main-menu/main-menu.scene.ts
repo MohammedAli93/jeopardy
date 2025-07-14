@@ -100,5 +100,10 @@ export class MainMenuScene extends Phaser.Scene {
         scale: { from: 0, to: 1 },
       },
     });
+
+    // [TEMP] We don't have a start button for now, so let's just wait 5 seconds and start the game.
+    this.time.delayedCall(5_000, () => {
+      this.scene.start("game");
+    });
   }
 }
