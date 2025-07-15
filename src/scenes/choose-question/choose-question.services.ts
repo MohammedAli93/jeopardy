@@ -80,7 +80,7 @@ export class ChooseQuestionServices {
         category,
         questionText
       );
-      this.scene.events.emit("question-selected", question);
+      this.scene.events.emit("question-selected", question, label.getBounds());
     });
   }
 

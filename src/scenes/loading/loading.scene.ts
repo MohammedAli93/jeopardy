@@ -46,6 +46,14 @@ export class LoadingScene extends Phaser.Scene {
     this.load.image("background", "background.jpg");
     this.load.image("card", "card.jpg");
 
+    // Clue Card
+    this.load.setPath("assets/scenes/clue-card");
+    this.load.setPrefix("scenes.clue-card.");
+
+    this.load.image("background", "background.jpg");
+    this.load.image("background-white-spotlight", "background-white-spotlight.jpg");
+    this.load.image("header-background", "header-background.webp");
+
     this.load.start();
   }
 

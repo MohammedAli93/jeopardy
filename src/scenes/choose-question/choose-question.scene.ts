@@ -48,11 +48,23 @@ export class ChooseQuestionScene extends Phaser.Scene {
       }
     }
 
-    this.events.on("question-selected", (question: Question) => {
-      console.log(question);
+    this.events.on("question-selected", (question: Question, questionBounds: Phaser.Geom.Rectangle) => {
+      console.log(question, questionBounds);
       this.services.disableAllInteraction();
       this.time.delayedCall(200, () => {
-        this.scene.start("reply-question", { question });
+        // this.scene.start("reply-question", { question });
+        // this.scene.pause();
+
+        this.renderer.snapshot((image) => {
+          const texture = this.textures.addImage(
+            "snapshot-choose-question",
+            image as HTMLImageElement
+          );
+          this.scene.start("clue-card", { question, questionBounds });
+          // this.scene.sleep();
+          // this.scene.bringToTop("clue-card");
+        });
+        // this.scene.start("clue-card", { question });
       });
     });
 

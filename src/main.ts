@@ -8,6 +8,7 @@ import { MainMenuScene } from "./scenes/main-menu/main-menu.scene";
 import { GameScene } from "./scenes/game/game.scene";
 import { ChooseQuestionScene } from "./scenes/choose-question/choose-question.scene";
 import { ReplyQuestionScene } from "./scenes/reply-question/reply-question.scene";
+import { ClueCardScene } from "./scenes/clue-card/clue-card.scene";
 
 document.addEventListener("DOMContentLoaded", () => {
   const config: Phaser.Types.Core.GameConfig = {
@@ -25,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
       GameScene,
       ChooseQuestionScene,
       ReplyQuestionScene,
+      ClueCardScene,
     ],
     plugins: {
       scene: [
