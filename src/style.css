@@ -6,6 +6,22 @@
     url("fonts/Swiss 911 Ultra Compressed BT.woff") format("woff");
 }
 
+@font-face {
+  font-family: "Swiss911 XCm BT Regular";
+  font-style: normal;
+  font-weight: normal;
+  src: local("fonts/Swiss911 XCm BT Regular"),
+    url("fonts/Swiss911 XCm BT Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Swiss921 BT Regular";
+  font-style: normal;
+  font-weight: normal;
+  src: local("fonts/Swiss921 BT Regular"),
+    url("fonts/Swiss921 BT Regular.ttf") format("truetype");
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

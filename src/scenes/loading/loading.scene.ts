@@ -41,6 +41,10 @@ export class LoadingScene extends Phaser.Scene {
 
     this.load.image("category-background", "category-background.png");
     this.load.image("question-background", "question-background.png");
+    this.load.image("jeopardy-small-logo", "jeopardy-small-logo.jpg");
+    this.load.image("jeopardy-large-logo", "jeopardy-large-logo.jpg");
+    this.load.image("background", "background.jpg");
+    this.load.image("card", "card.jpg");
 
     this.load.start();
   }
@@ -53,12 +57,12 @@ export class LoadingScene extends Phaser.Scene {
 
     this.load.once(Phaser.Loader.Events.COMPLETE, () => {
       this.fullLoaded.assets = true;
-      
+
       // Dev purpose.
       if (import.meta.env.DEV) {
         this.fullLoaded.assets = false;
-        this.scene.start("game");
-        // this.scene.start("choose-question");
+        // this.scene.start("game");
+        this.scene.start("choose-question");
         // this.scene.start("reply-question", { question: GameCore.questions.getQuestionsByCategory("Capitals")[0] });
       }
     });

@@ -55,6 +55,17 @@ export class ChooseQuestionScene extends Phaser.Scene {
         this.scene.start("reply-question", { question });
       });
     });
+
+    this.services.disableAllInteraction();
+    this.services.jeopardySmallLogoShow();
+    this.services.jeopardyLargeLogoShow(this.services.getQuestions());
+    this.time.delayedCall(1_000, async () => {
+      await this.services.startJeopardyLargeLogoAnimation(2);
+      this.time.delayedCall(500, async () => {
+        await this.services.startJeopardySmallLogoAnimation();
+        this.services.enableAllInteraction();
+      });
+    });
     // this.services.enable(this.services.getCategory("Capitals")!);
     // console.log(this.services.getQuestion("Capitals", "What is the capital of France?"));
     // console.log(this.services.getQuestions());

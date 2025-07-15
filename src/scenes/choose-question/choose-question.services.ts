@@ -125,4 +125,105 @@ export class ChooseQuestionServices {
       this.disableInteraction(label);
     }
   }
+
+  public enableAllInteraction() {
+    for (const label of this.getQuestions()) {
+      this.enableInteraction(label);
+    }
+  }
+
+  public async startJeopardyLargeLogoAnimation(childrenRemovedCount: number) {
+    const jeopardyLargeLogo = this.scene.children.getByName(
+      "jeopardy-large-logo"
+    ) as Phaser.GameObjects.Image | undefined;
+    const graphics = this.scene.children.getByName(
+      "jeopardy-large-logo-mask"
+    ) as Phaser.GameObjects.Graphics | undefined;
+    if (!jeopardyLargeLogo || !graphics) return;
+
+    const children = this.getQuestions();
+    const length = children.length;
+    const interval = length / childrenRemovedCount;
+    console.log(interval);
+    while (children.length > 0) {
+      for (let i = 0; i < childrenRemovedCount; i++) {
+        const index = Math.floor(Math.random() * children.length);
+        children.splice(index, 1);
+      }
+      this.jeopardyLargeLogoShow(children);
+      await new Promise((resolve) => this.scene.time.delayedCall(500, resolve));
+    }
+  }
+
+  public jeopardyLargeLogoShow(children: Label[]) {
+    this.scene.creator.createJeopardyLargeLogo();
+    const jeopardyLargeLogo = this.scene.children.getByName(
+      "jeopardy-large-logo"
+    ) as Phaser.GameObjects.Image | undefined;
+    const graphics = this.scene.children.getByName(
+      "jeopardy-large-logo-mask"
+    ) as Phaser.GameObjects.Graphics | undefined;
+    if (!jeopardyLargeLogo || !graphics) return;
+
+    graphics.clear();
+    const border = 4;
+    for (const child of children) {
+      const bounds = child.getBounds();
+      graphics.fillRect(
+        bounds.x + border / 2,
+        bounds.y + border / 2,
+        bounds.width - border,
+        bounds.height - border
+      );
+    }
+  }
+
+  public getCategoriesJeopardySmallLogo() {
+    return this.scene.children.getAll(
+      "name",
+      "category-jeopardy-small-logo"
+    ) as Phaser.GameObjects.Image[];
+  }
+
+  public jeopardySmallLogoShow() {
+    this.scene.creator.createCategoryJeopardySmallLogo();
+    const categories = this.getCategories();
+    for (const category of categories) {
+      category.setScale(0, 1);
+    }
+  }
+
+  public async startJeopardySmallLogoAnimation() {
+    const categoriesJeopardySmallLogo = this.getCategoriesJeopardySmallLogo();
+    await Promise.all(
+      categoriesJeopardySmallLogo.map(
+        (categoryJeopardySmallLogo) =>
+          new Promise((resolve) =>
+            this.scene.tweens.add({
+              targets: categoryJeopardySmallLogo,
+              props: {
+                scaleX: { from: 1.0, to: 0.0 },
+              },
+              duration: 300,
+              onComplete: resolve,
+            })
+          )
+      )
+    );
+    await Promise.all(
+      this.getCategories().map(
+        (category) =>
+          new Promise((resolve) =>
+            this.scene.tweens.add({
+              targets: category,
+              props: {
+                scaleX: { from: 0.0, to: 1.0 },
+              },
+              duration: 300,
+              onComplete: resolve,
+            })
+          )
+      )
+    );
+  }
 }
