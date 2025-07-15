@@ -80,15 +80,6 @@ export class ChooseQuestionServices {
         category,
         questionText
       );
-      this.scene.tweens.add({
-        targets: background,
-        props: {
-          angle: { from: -5, to: 5 },
-        },
-        yoyo: true,
-        repeat: 3,
-        duration: 150,
-      });
       this.scene.events.emit("question-selected", question);
     });
   }
