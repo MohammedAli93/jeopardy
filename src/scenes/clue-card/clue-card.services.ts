@@ -37,18 +37,58 @@ export class ClueCardServices {
     const container = this.scene.children.getByName(
       "clue-card-container"
     ) as Phaser.GameObjects.Container;
-    return new Promise((resolve) =>
-      this.scene.tweens.add({
-        targets: container,
-        props: {
-          scale: 1,
-          x: this.scene.scale.width / 2,
-          y: this.scene.scale.height / 2,
-        },
-        duration: 700,
-        onComplete: resolve,
-      })
-    );
+    const buttonBackground = container.getByName(
+      "button-background"
+    ) as Phaser.GameObjects.Image;
+    const background = container.getByName(
+      "background"
+    ) as Phaser.GameObjects.Image;
+    return Promise.all([
+      new Promise((resolve) =>
+        this.scene.tweens.add({
+          targets: container,
+          props: {
+            scale: 1,
+            x: this.scene.scale.width / 2,
+            y: this.scene.scale.height / 2,
+          },
+          duration: 700,
+          onComplete: resolve,
+        })
+      ),
+      new Promise((resolve) =>
+        this.scene.tweens.add({
+          targets: buttonBackground,
+          props: {
+            alpha: { from: 1, to: 0 },
+            displayWidth: {
+              from: buttonBackground.displayWidth,
+              to: background.displayWidth,
+            },
+            displayHeight: {
+              from: buttonBackground.displayHeight,
+              to: background.displayHeight,
+            },
+          },
+          duration: 700,
+          onComplete: () => {
+            buttonBackground.destroy();
+            resolve(undefined);
+          },
+        })
+      ),
+      new Promise((resolve) =>
+        this.scene.tweens.add({
+          targets: background,
+          props: {
+            alpha: { from: 0, to: 1 },
+          },
+          delay: 600,
+          duration: 100,
+          onComplete: resolve,
+        })
+      ),
+    ]);
   }
 
   public async startBackgroundToWhiteBackgroundAnimation() {
@@ -116,6 +156,8 @@ export class ClueCardServices {
           targets: headerContainer,
           props: {
             alpha: { from: 0, to: 1 },
+            scaleY: { from: 0, to: 1 },
+            y: { from: 0, to: headerContainer.getBounds().height / 2 },
           },
           duration: 500,
           onComplete: resolve,

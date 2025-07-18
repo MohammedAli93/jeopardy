@@ -3,7 +3,7 @@
   font-style: normal;
   font-weight: normal;
   src: local("fonts/Swiss 911 Ultra Compressed BT"),
-    url("fonts/Swiss 911 Ultra Compressed BT.woff") format("woff");
+    url("/fonts/Swiss 911 Ultra Compressed BT.woff") format("woff");
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   font-style: normal;
   font-weight: normal;
   src: local("fonts/Swiss911 XCm BT Regular"),
-    url("fonts/Swiss911 XCm BT Regular.ttf") format("truetype");
+    url("/fonts/Swiss911 XCm BT Regular.ttf") format("truetype");
 }
 
 @font-face {
@@ -19,7 +19,31 @@
   font-style: normal;
   font-weight: normal;
   src: local("fonts/Swiss921 BT Regular"),
-    url("fonts/Swiss921 BT Regular.ttf") format("truetype");
+    url("/fonts/Swiss921 BT Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "AtkinsonHyperlegibleNext-Regular";
+  font-style: normal;
+  font-weight: normal;
+  src: local("fonts/AtkinsonHyperlegibleNext-Regular"),
+    url("/fonts/AtkinsonHyperlegibleNext-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "ReenieBeanie-Regular";
+  font-style: normal;
+  font-weight: normal;
+  src: local("fonts/ReenieBeanie-Regular"),
+    url("/fonts/ReenieBeanie-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IBMPlexSans-Regular";
+  font-style: normal;
+  font-weight: normal;
+  src: local("fonts/IBMPlexSans-Regular"),
+    url("/fonts/IBMPlexSans-Regular.ttf") format("truetype");
 }
 
 :root {

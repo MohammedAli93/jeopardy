@@ -23,6 +23,7 @@ export class ClueCardScene extends Phaser.Scene {
 
   async create(data: ClueCardSceneData) {
     console.log("ClueCardScene create");
+    this.scene.stop("hud");
     this.creator.setup(data);
     await this.services.startZoomInAnimation();
     this.services.disappearSnapshot();
@@ -31,16 +32,16 @@ export class ClueCardScene extends Phaser.Scene {
       this.services.startShowHeaderAnimation(),
       this.services.startQuestionTextAnimation("bottom"),
     ]);
-    await Promise.all([
-      this.services.startExpandHeaderAnimation(),
-    ]);
-    await new Promise((resolve) => this.time.delayedCall(1_500, resolve));
-    await this.services.startCollapseHeaderAnimation();
-    await new Promise((resolve) => this.time.delayedCall(500, resolve));
-    await Promise.all([
-      this.services.startWhiteBackgroundToBackgroundAnimation(),
-      this.services.startHideHeaderAnimation(),
-      this.services.startQuestionTextAnimation("top"),
-    ]);
+    // await Promise.all([
+    //   this.services.startExpandHeaderAnimation(),
+    // ]);
+    // await new Promise((resolve) => this.time.delayedCall(1_500, resolve));
+    // await this.services.startCollapseHeaderAnimation();
+    // await new Promise((resolve) => this.time.delayedCall(500, resolve));
+    // await Promise.all([
+    //   this.services.startWhiteBackgroundToBackgroundAnimation(),
+    //   this.services.startHideHeaderAnimation(),
+    //   this.services.startQuestionTextAnimation("top"),
+    // ]);
   }
 }

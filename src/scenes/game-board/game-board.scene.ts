@@ -1,24 +1,24 @@
-import { ChooseQuestionServices } from "./choose-question.services";
-import { ChooseQuestionSceneCreator } from "./choose-question.creator";
+import { GameBoardSceneServices } from "./game-board.services";
+import { GameBoardSceneCreator } from "./game-board.creator";
 import { GameCore } from "../../core/game/game-core";
 import type { Question } from "../../core/game/models/questions.model";
 
-export class ChooseQuestionScene extends Phaser.Scene {
-  public creator: ChooseQuestionSceneCreator;
-  public services: ChooseQuestionServices;
+export class GameBoardScene extends Phaser.Scene {
+  public creator: GameBoardSceneCreator;
+  public services: GameBoardSceneServices;
 
   constructor() {
-    super("choose-question");
-    this.creator = new ChooseQuestionSceneCreator(this);
-    this.services = new ChooseQuestionServices(this);
+    super("game-board");
+    this.creator = new GameBoardSceneCreator(this);
+    this.services = new GameBoardSceneServices(this);
   }
 
   init() {
-    console.log("ChooseQuestionScene init");
+    console.log("GameBoardScene init");
   }
 
   create() {
-    console.log("ChooseQuestionScene create");
+    console.log("GameBoardScene create");
     this.creator.setup();
     this.services.setup();
     // console.log(this.services.getCategory("Capitals"));
@@ -48,6 +48,13 @@ export class ChooseQuestionScene extends Phaser.Scene {
       }
     }
 
+    // this.events.on("question-selected", (question: Question) => {
+    //   console.log(question);
+    //   this.services.disableAllInteraction();
+    //   this.time.delayedCall(1_000, () => {
+    //     this.scene.start("reply-question", { question });
+    //   });
+    // });
     this.events.on("question-selected", (question: Question, questionBounds: Phaser.Geom.Rectangle) => {
       console.log(question, questionBounds);
       this.services.disableAllInteraction();
@@ -68,18 +75,16 @@ export class ChooseQuestionScene extends Phaser.Scene {
       });
     });
 
-    if (import.meta.env.PROD) {
-      this.services.disableAllInteraction();
-      this.services.jeopardySmallLogoShow();
-      this.services.jeopardyLargeLogoShow(this.services.getQuestions());
-      this.time.delayedCall(1_000, async () => {
-        await this.services.startJeopardyLargeLogoAnimation(2);
-        this.time.delayedCall(500, async () => {
-          await this.services.startJeopardySmallLogoAnimation();
-          this.services.enableAllInteraction();
-        });
+    this.services.disableAllInteraction();
+    this.services.jeopardySmallLogoShow();
+    this.services.jeopardyLargeLogoShow(this.services.getQuestions());
+    this.time.delayedCall(1_000, async () => {
+      await this.services.startJeopardyLargeLogoAnimation(2);
+      this.time.delayedCall(500, async () => {
+        await this.services.startJeopardySmallLogoAnimation();
+        this.services.enableAllInteraction();
       });
-    }
+    });
     // this.services.enable(this.services.getCategory("Capitals")!);
     // console.log(this.services.getQuestion("Capitals", "What is the capital of France?"));
     // console.log(this.services.getQuestions());
@@ -93,16 +98,8 @@ export class ChooseQuestionScene extends Phaser.Scene {
     //   .setFontFamily("'Swiss 911 Ultra Compressed BT'")
     //   .setFontSize(80);
 
-    this.services.startInputAnimation();
-    // console.log(this.children.getByName("container"))
-    // const container = this.children.getByName("container");
-    // this.tweens.add({
-    //   targets: container,
-    //   props: {
-    //     scale: { from: 1, to: 0.85 },
-    //   },
-    //   duration: 500,
-    // })
-    // this.scene.launch("podium", { podiums: [{ name: "Morgan" }, { name: "You" }, { name: "Jessica" }] });
+    this.scene.launch("podium", {
+      podiums: [{ name: "Morgan", price: 100 }, { name: "You", price: 200 }, { name: "Jessica", price: 300 }],
+    });
   }
 }

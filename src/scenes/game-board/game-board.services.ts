@@ -1,12 +1,11 @@
 import type Label from "phaser3-rex-plugins/templates/ui/label/Label";
-import type { ChooseQuestionScene } from "./choose-question.scene";
+import type { GameBoardScene } from "./game-board.scene";
 import { GameCore } from "../../core/game/game-core";
-import type Sizer from "phaser3-rex-plugins/templates/ui/sizer/Sizer";
 
-export class ChooseQuestionServices {
-  private scene: ChooseQuestionScene;
+export class GameBoardSceneServices {
+  private scene: GameBoardScene;
 
-  constructor(scene: ChooseQuestionScene) {
+  constructor(scene: GameBoardScene) {
     this.scene = scene;
   }
 
@@ -57,12 +56,22 @@ export class ChooseQuestionServices {
     text.setTint(0xffffff);
     background.setInteractive({ useHandCursor: true });
     background.on(Phaser.Input.Events.POINTER_OVER, () => {
-      if (!background.texture.key.endsWith("-hover"))
-        background.setTexture(`${background.texture.key}-hover`);
+      this.scene.tweens.add({
+        targets: background,
+        props: {
+          alpha: { from: 1.0, to: 0.8 },
+        },
+        duration: 100,
+      });
     });
     background.on(Phaser.Input.Events.POINTER_OUT, () => {
-      if (background.texture.key.endsWith("-hover"))
-        background.setTexture(background.texture.key.replace("-hover", ""));
+      this.scene.tweens.add({
+        targets: background,
+        props: {
+          alpha: { from: 0.8, to: 1.0 },
+        },
+        duration: 100,
+      });
     });
     background.on(Phaser.Input.Events.POINTER_DOWN, () => {
       const category = label.getData("category");
@@ -124,6 +133,9 @@ export class ChooseQuestionServices {
     if (!jeopardyLargeLogo || !graphics) return;
 
     const children = this.getQuestions();
+    const length = children.length;
+    const interval = length / childrenRemovedCount;
+    console.log(interval);
     while (children.length > 0) {
       for (let i = 0; i < childrenRemovedCount; i++) {
         const index = Math.floor(Math.random() * children.length);
@@ -204,19 +216,5 @@ export class ChooseQuestionServices {
           )
       )
     );
-  }
-
-  public async startInputAnimation() {
-    if (!this.scene.children.getByName("input-container")) {
-      this.scene.creator.createInput();
-    }
-    const container = this.scene.children.getByName("container") as Sizer;
-    this.scene.tweens.add({
-      targets: container,
-      props: {
-        scale: { from: 1, to: 0.85 },
-      },
-      duration: 500,
-    });
   }
 }

@@ -1,21 +1,19 @@
 import type GridSizer from "phaser3-rex-plugins/templates/ui/gridsizer/GridSizer";
 import { GameCore } from "../../core/game/game-core";
 import { fitToSize } from "../../utils/size";
-import type { ChooseQuestionScene } from "./choose-question.scene";
-import { InputComponent } from "../../components/input";
+import type { GameBoardScene } from "./game-board.scene";
 
-const CELL_PADDING = 16;
-const CATEGORIES_AND_QUESTIONS_Y_SEPARATION = 31; // Separation between the categories and the questions.
+const CATEGORIES_AND_QUESTIONS_Y_SEPARATION = 8; // Separation between the categories and the questions.
 
-const CONTAINER_X = 96;
-const CONTAINER_Y = 96;
-const CONTAINER_WIDTH = 1728;
-const CONTAINER_HEIGHT = 792;
+const CONTAINER_X = 292;
+const CONTAINER_Y = 170;
+const CONTAINER_WIDTH = 1336;
+const CONTAINER_HEIGHT = 672;
 
-export class ChooseQuestionSceneCreator {
-  private scene: ChooseQuestionScene;
+export class GameBoardSceneCreator {
+  private scene: GameBoardScene;
 
-  constructor(scene: ChooseQuestionScene) {
+  constructor(scene: GameBoardScene) {
     this.scene = scene;
   }
 
@@ -26,29 +24,25 @@ export class ChooseQuestionSceneCreator {
     const rows = GameCore.questions.getQuestionsMaxCount();
     const containerWidth = CONTAINER_WIDTH;
     const containerHeight = CONTAINER_HEIGHT;
-    const cellWidth = (containerWidth - (columns - 1) * CELL_PADDING) / columns;
+    const cellWidth = (containerWidth - columns - 1) / columns;
     const cellHeight =
-      (containerHeight -
-        (rows - 1) * CELL_PADDING -
-        CATEGORIES_AND_QUESTIONS_Y_SEPARATION) /
+      (containerHeight - rows - 1 - CATEGORIES_AND_QUESTIONS_Y_SEPARATION) /
       (rows + 1); // +1 because of the category cell.
 
     this.scene.add.image(
       width / 2,
       height / 2,
-      "scenes.choose-question.background"
+      "scenes.game-board.background"
     );
 
     const container = this.scene.rexUI.add.sizer({
       orientation: "vertical",
-      x: CONTAINER_X + CONTAINER_WIDTH / 2,
+      x: CONTAINER_X,
       y: CONTAINER_Y,
       width: containerWidth,
       height: containerHeight,
       space: { item: CATEGORIES_AND_QUESTIONS_Y_SEPARATION },
-      originX: 0.5,
-      originY: 0,
-      name: "container",
+      origin: 0,
     });
 
     const categories = this.scene.rexUI.add.gridSizer({
@@ -58,7 +52,6 @@ export class ChooseQuestionSceneCreator {
       rowProportions: 1,
       // We don't need width because this `gridSizer` will be expanded to the full width of the `container`.
       height: cellHeight,
-      space: { column: CELL_PADDING },
     });
 
     const questions = this.scene.rexUI.add.gridSizer({
@@ -67,13 +60,12 @@ export class ChooseQuestionSceneCreator {
       columnProportions: 1,
       rowProportions: 1,
       name: "questions",
-      space: { column: CELL_PADDING },
     });
 
     for (const category of GameCore.questions.categories) {
       const categoryLabel = this.createLabel({
         text: category,
-        bgKey: "scenes.choose-question.category-card",
+        bgKey: "scenes.game-board.card",
         cellHeight,
         color: "#ffffff",
         fontSize: 32,
@@ -89,14 +81,13 @@ export class ChooseQuestionSceneCreator {
         column: 1,
         columnProportions: 1,
         rowProportions: 1,
-        space: { row: CELL_PADDING },
       });
       for (const question of GameCore.questions.getQuestionsByCategory(
         category
       )) {
         const questionLabel = this.createLabel({
           text: `$${question.price}`,
-          bgKey: "scenes.choose-question.question-card",
+          bgKey: "scenes.game-board.card",
           cellHeight,
           color: "#EABD5E",
           fontSize: 100,
@@ -130,7 +121,7 @@ export class ChooseQuestionSceneCreator {
         .image(
           bounds.centerX,
           bounds.centerY,
-          "scenes.choose-question.jeopardy-small-logo"
+          "scenes.game-board.jeopardy-small-logo"
         )
         .setName("category-jeopardy-small-logo");
     }
@@ -142,7 +133,7 @@ export class ChooseQuestionSceneCreator {
     ) as Phaser.GameObjects.Image | undefined;
     if (hasJeopardyLargeLogo) return;
     const jeopardyLargeLogo = this.scene.add
-      .image(0, 0, "scenes.choose-question.jeopardy-large-logo")
+      .image(0, 0, "scenes.game-board.jeopardy-large-logo")
       .setName("jeopardy-large-logo");
     const graphics = this.scene.add
       .graphics()
@@ -197,10 +188,6 @@ export class ChooseQuestionSceneCreator {
     //   duration: 100,
     // });
     return label;
-  }
-
-  public createInput() {
-    new InputComponent(this.scene).setup();
   }
 }
 
