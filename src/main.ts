@@ -1,6 +1,7 @@
 import "./style.css";
 import Phaser from "phaser";
 import RexUIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
+import PerspectiveImagePlugin from 'phaser3-rex-plugins/plugins/perspectiveimage-plugin.js'
 
 // Pipelines
 import CurvedPostFX from "./pipelines/curved-post-fx";
@@ -48,6 +49,11 @@ document.addEventListener("DOMContentLoaded", () => {
           mapping: "rexUI",
         },
       ],
+      global: [{
+        key: 'rexPerspectiveImagePlugin',
+        plugin: PerspectiveImagePlugin,
+        start: true
+    }]
     },
     // @ts-expect-error Ignore this error because we're using a custom pipeline.
     pipeline: { CurvedPostFX }

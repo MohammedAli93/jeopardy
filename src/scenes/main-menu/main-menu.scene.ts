@@ -2,6 +2,8 @@
 
 export class MainMenuScene extends Phaser.Scene {
   // private cameraTween?: Phaser.Tweens.Tween;
+  private buttons: any[] = [];
+  private mousePosition = { x: 0, y: 0 };
 
   constructor() {
     super("main-menu");
@@ -11,6 +13,8 @@ export class MainMenuScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.scene.launch("hud");
     this.scene.bringToTop("hud");
+
+
 
     // Background
     this.add.image(width / 2, height / 2, "scenes.main-menu.background");
@@ -30,12 +34,8 @@ export class MainMenuScene extends Phaser.Scene {
       originY: 0,
     });
 
-    // Title
-    const title = this.add.image(
-      width / 2,
-      height / 2,
-      "scenes.main-menu.logo"
-    );
+    // Title - Create perspective logo
+    const title = this.createPerspectiveLogo();
 
     // sizer.add(titleBackground);
     sizer.add(title);
@@ -44,6 +44,13 @@ export class MainMenuScene extends Phaser.Scene {
     sizer.add(this.createButtons(), { padding: { top: 10 } });
     sizer.layout();
     sizer.setAlpha(0);
+
+    // Update logo position after layout
+    const logoInButtons = this.buttons.find(btn => btn.isLogo);
+    if (logoInButtons) {
+      logoInButtons.x = title.x;
+      logoInButtons.y = title.y;
+    }
 
     // Animations
     this.tweens.add({
@@ -69,6 +76,9 @@ export class MainMenuScene extends Phaser.Scene {
     // this.cameras.main.setPostPipeline(CurvedPostFX);
     // this.cameras.main.setZoom(1.05);
     // this.cameras.main.setBounds(0, 0, 1920, 1080);
+
+    // Setup mouse tracking for perspective animation
+    this.setupMouseTracking();
 
     // [TEMP] We don't have a start button for now, so let's just wait 5 seconds and start the game.
     this.time.delayedCall(500, () => {
@@ -109,59 +119,101 @@ export class MainMenuScene extends Phaser.Scene {
   //   return this.scale.width / 2 - restWidth / 2 + panPosition;
   // }
 
-  private createButton(text: string, _index: number, callback?: () => void) {
-    const sizer = this.rexUI.add.overlapSizer({});
-    const button = this.add.image(0, 0, "scenes.main-menu.button");
+  private createButton(text: string, index: number, callback?: () => void) {
+    // Create text for the button
     const textObj = this.add
       .text(0, 0, text)
       .setFontSize(34)
       .setFontFamily("'AtkinsonHyperlegibleNext-Regular'")
+      .setDepth(1)
       .setColor("#ffffff");
 
-    button.setInteractive({ useHandCursor: true });
+    // Get button dimensions from texture
+    const buttonTexture = this.textures.get("scenes.main-menu.button");
+    const buttonWidth = buttonTexture.source[0].width;
+    const buttonHeight = buttonTexture.source[0].height;
 
-    button.on(Phaser.Input.Events.POINTER_OVER, () => {
-      button.setTexture("scenes.main-menu.button-hover");
-      textObj.setColor("#000000");
-
-      // const targetX = this.getPanPositionByIndex(index, 4);
-
-      // // Kill existing tween if running
-      // if (this.cameraTween?.isPlaying()) {
-      //   this.cameraTween.stop();
-      // }
-
-      // // Tween camera scrollX smoothly
-      // this.cameraTween = this.tweens.add({
-      //   targets: this.cameras.main,
-      //   scrollX: targetX - this.scale.width / 2, // convert to scroll position
-      //   duration: 500,
-      //   ease: "Cubic.easeOut",
-      // });
+    // Create perspective card wrapper using button texture
+    const perspectiveCard = this.add.rexPerspectiveCard({
+      x: 0,
+      y: 0,
+      width: buttonWidth,
+      height: buttonHeight,
+      front: {
+        key: "scenes.main-menu.button"
+      },
+      back: {
+        key: "scenes.main-menu.button"
+      }
     });
 
-    button.on(Phaser.Input.Events.POINTER_OUT, () => {
-      button.setTexture("scenes.main-menu.button");
+    // Set initial rotation to show back face (Y = 180 degrees)
+    perspectiveCard.rotateY = Phaser.Math.DegToRad(180);
+
+    // Make perspective card interactive instead of button
+    perspectiveCard.setInteractive({ useHandCursor: true });
+
+    // Store button data for tracking
+    const buttonObj = {
+      card: perspectiveCard,
+      text: textObj,
+      width: buttonWidth,
+      height: buttonHeight,
+      isHovered: false,
+      targetRotationX: 0,
+      targetRotationY: 0,
+      currentRotationX: 0,
+      currentRotationY: 0,
+      baseAngleY: 180,
+      x: 0, // Will be set when positioned
+      y: 0, // Will be set when positioned
+      callback: callback
+    };
+
+    // Add original hover/out/click functionality with perspective animation
+    perspectiveCard.on(Phaser.Input.Events.POINTER_OVER, () => {
+      buttonObj.isHovered = true;
+      // Just change text color and add scale effect for hover feedback
+      perspectiveCard.backFace.setTexture("scenes.main-menu.button-hover");
+      perspectiveCard.angleY = 180;
+      textObj.setColor("#000000"); // black text for hover
+      this.tweens.add({
+        targets: [perspectiveCard, textObj],
+        scaleX: 1.12,
+        scaleY: 1.12,
+        duration: 200,
+        ease: 'Power2'
+      });
+    });
+
+    perspectiveCard.on(Phaser.Input.Events.POINTER_OUT, () => {
+      buttonObj.isHovered = false;
+      // Reset text color and scale
       textObj.setColor("#ffffff");
-
-      // Reset camera position
-      // if (this.cameraTween?.isPlaying()) {
-      //   this.cameraTween.stop();
-      // }
-
-      // this.cameraTween = this.tweens.add({
-      //   targets: this.cameras.main,
-      //   scrollX: 0,
-      //   duration: 600,
-      //   ease: "Cubic.easeInOut",
-      // });
+      perspectiveCard.backFace.setTexture("scenes.main-menu.button");
+      this.tweens.add({
+        targets: [perspectiveCard, textObj],
+        scaleX: 1,
+        scaleY: 1,
+        duration: 200,
+        ease: 'Power2'
+      });
+      
+      // Reset rotation when not hovering
+      buttonObj.targetRotationX = 0;
+      buttonObj.targetRotationY = 0;
     });
 
-    button.on(Phaser.Input.Events.POINTER_DOWN, () => {
+    perspectiveCard.on(Phaser.Input.Events.POINTER_DOWN, () => {
       if (callback) callback();
     });
 
-    sizer.add(button, {
+    this.buttons.push(buttonObj);
+
+    // Create sizer with original structure
+    const sizer = this.rexUI.add.overlapSizer({});
+    
+    sizer.add(perspectiveCard, {
       align: "center",
       expand: false,
     });
@@ -172,7 +224,90 @@ export class MainMenuScene extends Phaser.Scene {
       offsetY: -10,
     });
 
+    // Store reference to update position later for mouse tracking
+    sizer.on('sizer.postlayout', () => {
+      buttonObj.x = sizer.x;
+      buttonObj.y = sizer.y;
+    });
+
     return sizer;
+    }
+
+  private createPerspectiveLogo() {
+    // Get logo dimensions from texture
+    const logoTexture = this.textures.get("scenes.main-menu.logo");
+    const logoWidth = logoTexture.source[0].width;
+    const logoHeight = logoTexture.source[0].height;
+
+    // Create perspective card wrapper using logo texture
+    const perspectiveLogo = this.add.rexPerspectiveCard({
+      x: 0,
+      y: 0,
+      width: logoWidth,
+      height: logoHeight,
+      front: {
+        key: "scenes.main-menu.logo"
+      },
+      back: {
+        key: "scenes.main-menu.logo"
+      }
+    });
+
+    // Set initial rotation to show back face (Y = 180 degrees)
+    perspectiveLogo.rotateY = Phaser.Math.DegToRad(180);
+
+    // Store logo data for tracking
+    const logoObj = {
+      card: perspectiveLogo,
+      width: logoWidth,
+      height: logoHeight,
+      isHovered: false,
+      targetRotationX: 0,
+      targetRotationY: 0,
+      currentRotationX: 0,
+      currentRotationY: 0,
+      baseAngleY: 180,
+      x: 0, // Will be set when positioned
+      y: 0, // Will be set when positioned
+      isLogo: true // Flag to identify this as the logo
+    };
+
+    // Make logo interactive for hover effects
+    perspectiveLogo.setInteractive({ useHandCursor: false });
+
+    // Add hover effects for logo
+    perspectiveLogo.on(Phaser.Input.Events.POINTER_OVER, () => {
+      logoObj.isHovered = true;
+      // Subtle scale up effect for logo
+      this.tweens.add({
+        targets: perspectiveLogo,
+        scaleX: 1.05,
+        scaleY: 1.05,
+        duration: 300,
+        ease: 'Power2'
+      });
+    });
+
+    perspectiveLogo.on(Phaser.Input.Events.POINTER_OUT, () => {
+      logoObj.isHovered = false;
+      // Scale back to normal
+      this.tweens.add({
+        targets: perspectiveLogo,
+        scaleX: 1,
+        scaleY: 1,
+        duration: 300,
+        ease: 'Power2'
+      });
+      
+      // Reset rotation when not hovering
+      logoObj.targetRotationX = 0;
+      logoObj.targetRotationY = 0;
+    });
+
+    // Add logo to buttons array for tracking
+    this.buttons.push(logoObj);
+
+    return perspectiveLogo;
   }
 
   private createButtons() {
@@ -201,5 +336,34 @@ export class MainMenuScene extends Phaser.Scene {
     sizer.add(button);
 
     return sizer;
+  }
+
+
+
+  private setupMouseTracking() {
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      this.mousePosition.x = pointer.x;
+      this.mousePosition.y = pointer.y;
+    });
+  }
+
+  update() {
+    // Update global rotation based on mouse X position
+    this.updateGlobalCardRotation();
+  }
+
+  // Update base Y rotation (160° to 200°) for all cards based on mouse X position across the viewport
+  private updateGlobalCardRotation() {
+    const screenWidth = Number(this.scale.width) || Number(this.game.config.width) || 1920;
+    const mouseX = Phaser.Math.Clamp(this.mousePosition.x, 0, screenWidth);
+    // Map mouseX (0..screenWidth) to rotation 160..200°
+    const newBaseRotationY = 160 + (mouseX / screenWidth) * 40;
+
+    // Update baseRotationY for each button
+    this.buttons.forEach(buttonObj => {
+      if (buttonObj.card && buttonObj.card.angleY !== undefined && !buttonObj.isHovered) {
+        buttonObj.card.angleY = newBaseRotationY;
+      }
+    });
   }
 }
