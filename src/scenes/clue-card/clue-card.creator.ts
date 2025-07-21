@@ -147,4 +147,121 @@ export class ClueCardSceneCreator {
       topCenter - headerCategoryText.displayHeight / 2
     );
   }
+
+  public createInstructionText(text: string, color: string = '#ffffff'): Phaser.GameObjects.Text {
+    const { width, height } = this.scene.scale;
+    return this.scene.add.text(width / 2, height - 150, text, {
+      fontSize: '34px',
+      color: color,
+      fontFamily: "'Swiss 911 Ultra Compressed BT'",
+      align: 'center'
+    }).setOrigin(0.5).setName('instruction-text');
+  }
+
+  public createQuestionDisplay(): Phaser.GameObjects.Text {
+    const { width, height } = this.scene.scale;
+    return this.scene.add.text(width / 2, height - 100, "", {
+      fontSize: '32px',
+      color: '#ffffff',
+      fontFamily: "'Swiss 911 Ultra Compressed BT'",
+      align: 'center',
+      wordWrap: { width: width - 200 }
+    }).setOrigin(0.5).setName('question-display');
+  }
+
+  public createBuzzingTimer(initialTime: string = "8"): Phaser.GameObjects.Text {
+    const { width } = this.scene.scale;
+    return this.scene.add.text(width - 100, 50, initialTime, {
+      fontSize: '48px',
+      color: '#ff0000',
+      fontFamily: "'Swiss 911 Ultra Compressed BT'",
+      align: 'center'
+    }).setOrigin(0.5).setName('buzzing-timer');
+  }
+
+  public createAnswerTimer(initialTime: string = "5"): Phaser.GameObjects.Text {
+    const { width } = this.scene.scale;
+    return this.scene.add.text(width - 100, 50, initialTime, {
+      fontSize: '48px',
+      color: '#ffff00',
+      fontFamily: "'Swiss 911 Ultra Compressed BT'",
+      align: 'center'
+    }).setOrigin(0.5).setName('answer-timer');
+  }
+
+  public createAnswerInput(): { inputBg: Phaser.GameObjects.Rectangle, prompt: Phaser.GameObjects.Text, inputText: Phaser.GameObjects.Text } {
+    const { width, height } = this.scene.scale;
+    
+    // Create input background
+    const inputBg = this.scene.add.rectangle(width / 2, height - 350, 600, 80, 0xffffff, 0.9)
+      .setStrokeStyle(4, 0x000000)
+      .setName('input-background');
+    
+    // Create input prompt
+    const prompt = this.scene.add.text(width / 2, height - 400, "Enter your answer:", {
+      fontSize: '32px',
+      color: '#000000',
+      fontFamily: "'Swiss 911 Ultra Compressed BT'",
+      align: 'center'
+    }).setOrigin(0.5).setName('answer-prompt');
+    
+    // Create input field placeholder
+    const inputText = this.scene.add.text(width / 2, height - 350, "Type here and press ENTER", {
+      fontSize: '24px',
+      color: '#666666',
+      fontFamily: "'Swiss 911 Ultra Compressed BT'",
+      align: 'center'
+    }).setOrigin(0.5).setName('input-text');
+
+    return { inputBg, prompt, inputText };
+  }
+
+  public createResultMessage(text: string, color: string): Phaser.GameObjects.Text {
+    const { width, height } = this.scene.scale;
+    
+    // Remove existing messages
+    const existingMessage = this.scene.children.getByName('result-message');
+    if (existingMessage) {
+      existingMessage.destroy();
+    }
+    
+    return this.scene.add.text(width / 2, height - 100, text, {
+      fontSize: '28px',
+      color: color,
+      fontFamily: "'Swiss 911 Ultra Compressed BT'",
+      align: 'center'
+    }).setOrigin(0.5).setName('result-message');
+  }
+
+  public createPenaltyMessage(text: string): Phaser.GameObjects.Text {
+    const { width, height } = this.scene.scale;
+    return this.scene.add.text(
+      width / 2, 
+      height - 50, 
+      text,
+      { fontSize: '32px', color: '#ff0000', fontFamily: "'Swiss 911 Ultra Compressed BT'" }
+    ).setOrigin(0.5).setName('penalty-message');
+  }
+
+  public createBuzzMessage(text: string): Phaser.GameObjects.Text {
+    const { width, height } = this.scene.scale;
+    return this.scene.add.text(
+      width / 2,
+      height - 50,
+      text,
+      { fontSize: '32px', color: '#00ff00', fontFamily: "'Swiss 911 Ultra Compressed BT'" }
+    ).setOrigin(0.5).setName('buzz-message');
+  }
+
+  public updateInstructionText(text: string, color: string): void {
+    const instructionText = this.scene.children.getByName('instruction-text') as Phaser.GameObjects.Text;
+    if (instructionText && instructionText.active && this.scene.scene.isActive()) {
+      try {
+        instructionText.setText(text);
+        instructionText.setColor(color);
+      } catch (error) {
+        console.warn("Error updating instruction text:", error);
+      }
+    }
+  }
 }

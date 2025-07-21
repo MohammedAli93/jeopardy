@@ -200,7 +200,46 @@ export class ChooseQuestionSceneCreator {
   }
 
   public createInput() {
-    new InputComponent(this.scene).setup();
+    // new InputComponent(this.scene).setup();
+  }
+
+  public createRoundInfo(roundTitle: string): Phaser.GameObjects.Text {
+    const { width } = this.scene.scale;
+    return this.scene.add.text(width / 2, 50, roundTitle, {
+      fontSize: '48px',
+      color: '#ffffff',
+      fontFamily: "'Swiss 911 Ultra Compressed BT'",
+      align: 'center'
+    }).setOrigin(0.5).setName('round-info');
+  }
+
+  public createCurrentPlayerIndicator(playerName: string, isHuman: boolean): Phaser.GameObjects.Text {
+    const { width } = this.scene.scale;
+    
+    // Remove existing player indicator
+    const existingIndicator = this.scene.children.getByName('current-player-indicator');
+    if (existingIndicator) {
+      existingIndicator.destroy();
+    }
+    
+    return this.scene.add.text(width / 2, 100, `${playerName}'s Turn`, {
+      fontSize: '32px',
+      color: isHuman ? '#00ff00' : '#ffff00',
+      fontFamily: "'Swiss 911 Ultra Compressed BT'",
+      align: 'center'
+    }).setOrigin(0.5).setName('current-player-indicator');
+  }
+
+  public createAIThinkingText(playerName: string): Phaser.GameObjects.Text {
+    const { width } = this.scene.scale;
+    return this.scene.add.text(width / 2, 150, 
+      `${playerName} is selecting...`, {
+        fontSize: '24px',
+        color: '#ffff00',
+        fontFamily: "'Swiss 911 Ultra Compressed BT'",
+        align: 'center'
+      }
+    ).setOrigin(0.5).setName('ai-thinking');
   }
 }
 

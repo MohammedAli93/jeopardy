@@ -127,7 +127,7 @@ export class MainMenuScene extends Phaser.Scene {
   //   return this.scale.width / 2 - restWidth / 2 + panPosition;
   // }
 
-  private createButton(text: string, index: number, callback?: () => void) {
+  private createButton(text: string, _index: number, callback?: () => void) {
     // Create text for the button
     const textObj = this.add
       .text(0, 0, text)

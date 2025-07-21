@@ -31,7 +31,7 @@ export class PodiumSceneCreator {
   private createPodiumCard(podium: PodiumSceneData["podiums"][number]) {
     const podiumCard = this.scene.rexUI.add.overlapSizer({
       name: "podium-card",
-    });
+    }).setName("podium-card");
     podiumCard.setData("name", podium.name);
 
     podiumCard.add(this.scene.add.image(0, 0, "scenes.podium.card"), {

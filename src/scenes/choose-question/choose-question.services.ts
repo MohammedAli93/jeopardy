@@ -102,6 +102,26 @@ export class ChooseQuestionServices {
     background.removeInteractive(true);
   }
 
+  public hideQuestionValue(label: Label) {
+    const text = label.getElement("text") as
+      | Phaser.GameObjects.Text
+      | undefined;
+    if (!text) return;
+
+    // Hide the question value text
+    text.setVisible(false);
+  }
+
+  public showQuestionValue(label: Label) {
+    const text = label.getElement("text") as
+      | Phaser.GameObjects.Text
+      | undefined;
+    if (!text) return;
+
+    // Show the question value text
+    text.setVisible(true);
+  }
+
   public disableAllInteraction() {
     for (const label of this.getQuestions()) {
       this.disableInteraction(label);
@@ -111,6 +131,73 @@ export class ChooseQuestionServices {
   public enableAllInteraction() {
     for (const label of this.getQuestions()) {
       this.enableInteraction(label);
+    }
+  }
+
+  public animateCurrentPlayerPodium(playerName: string) {
+    // Get the podium scene
+    const podiumScene = this.scene.scene.get("podium");
+    if (!podiumScene || !podiumScene.scene.isActive()) return;
+
+    // Get the podium card for the current player
+    const podiumServices = (podiumScene as any).services;
+    if (!podiumServices) return;
+
+    const currentPodiumCard = podiumServices.getPodiumCardByName(playerName);
+    if (!currentPodiumCard) return;
+
+    // Reset all podiums to normal position first
+    this.resetAllPodiumsPosition();
+
+    // Animate the current player's podium up by 66px
+    this.scene.tweens.add({
+      targets: currentPodiumCard,
+      y: currentPodiumCard.y - 66,
+      duration: 300,
+      ease: 'Power2.easeOut'
+    });
+  }
+
+    private resetAllPodiumsPosition() {
+    // Get the podium scene
+    const podiumScene = this.scene.scene.get("podium");
+    if (!podiumScene || !podiumScene.scene.isActive()) return;
+
+    const podiumServices = (podiumScene as any).services;
+    if (!podiumServices) return;
+
+    const allPodiumCards = podiumServices.getPodiumCards();
+    
+    // Reset all podiums to their original positions
+    for (const podiumCard of allPodiumCards) {
+      this.scene.tweens.killTweensOf(podiumCard); // Kill any existing tweens
+      
+      const originalY = podiumCard.getData('originalY');
+      if (originalY !== undefined) {
+        this.scene.tweens.add({
+          targets: podiumCard,
+          y: originalY,
+          duration: 300,
+          ease: 'Power2.easeOut'
+        });
+      }
+    }
+  }
+
+  public storePodiumOriginalPositions() {
+    // Store original positions for reset
+    const podiumScene = this.scene.scene.get("podium");
+    if (!podiumScene || !podiumScene.scene.isActive()) return;
+
+    const podiumServices = (podiumScene as any).services;
+    if (!podiumServices) return;
+
+    const allPodiumCards = podiumServices.getPodiumCards();
+    
+    for (const podiumCard of allPodiumCards) {
+      if (!podiumCard.getData('originalY')) {
+        podiumCard.setData('originalY', podiumCard.y);
+      }
     }
   }
 
