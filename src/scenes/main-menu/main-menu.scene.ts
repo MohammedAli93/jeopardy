@@ -4,7 +4,6 @@ export class MainMenuScene extends Phaser.Scene {
   // private cameraTween?: Phaser.Tweens.Tween;
   private buttons: any[] = [];
   private mousePosition = { x: 0, y: 0 };
-  private backgroundImage: Phaser.GameObjects.Image | null = null;
   private loading: boolean = true;
 
   constructor() {
@@ -17,14 +16,13 @@ export class MainMenuScene extends Phaser.Scene {
     this.scene.bringToTop("hud");
 
     // Background with parallax scroll effect
-    const backgroundImage = this.add.image(width / 2, height / 2, "scenes.main-menu.background");
+    const backgroundImage = this.add.image(width / 2, height / 2, "scenes.main-menu.background")
+    .setName("background-image");
     backgroundImage.setDisplaySize(width * 2, height * 1.8); // Make it wider for scrolling
     backgroundImage.setDepth(-1);
 
 
     // Add background to tracking
-    this.backgroundImage = backgroundImage;
-
     // Title Background
     const titleBackground = this.add.image(
       width / 2,
@@ -404,7 +402,8 @@ export class MainMenuScene extends Phaser.Scene {
 
   update() {
     // Update background position based on mouse position
-    if (this.backgroundImage && !this.loading) {
+    const backgroundImage = this.children.getByName("background-image") as Phaser.GameObjects.Image;
+    if (backgroundImage && !this.loading) {
       const screenWidth = Number(this.scale.width) || Number(this.game.config.width) || 1920;
       const mouseX = Phaser.Math.Clamp(this.mousePosition.x, 0, screenWidth);
       
@@ -414,11 +413,11 @@ export class MainMenuScene extends Phaser.Scene {
       const scrollOffset = ((mouseX / screenWidth) - 0.5) * scrollRange * 2;
       
       // Smoothly update the background position
-      const currentX = this.backgroundImage.x;
+      const currentX = backgroundImage.x;
       const targetX = (screenWidth / 2) + scrollOffset;
       const newX = Phaser.Math.Linear(currentX, targetX, 0.1); // Smooth interpolation
       
-      this.backgroundImage.x = newX;
+      backgroundImage.x = newX;
     }
 
     // Update global rotation for other elements
