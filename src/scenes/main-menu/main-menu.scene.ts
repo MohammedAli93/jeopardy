@@ -24,12 +24,13 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Add background to tracking
     // Title Background
-    const titleBackground = this.add.image(
-      width / 2,
-      height / 2,
-      "scenes.main-menu.title-background"
-    );
-    titleBackground.setAlpha(0);
+    // const titleBackground = this.add.image(
+    //   width / 2,
+    //   height / 2,
+    //   "scenes.main-menu.title-background"
+    // );
+    // titleBackground.setAlpha(0).setName("title-background");
+    const titleBackground = this.createTitleBackground();
 
     const sizer = this.rexUI.add.sizer({
       orientation: "vertical",
@@ -44,8 +45,8 @@ export class MainMenuScene extends Phaser.Scene {
     // sizer.add(titleBackground);
     sizer.add(title);
     sizer.add(this.createButtonStack());
-    sizer.add(this.add.image(0, 0, "scenes.main-menu.divider-h"));
-    sizer.add(this.createButtons(), { padding: { top: 10 } });
+    // sizer.add(this.add.image(0, 0, "scenes.main-menu.divider-h"));
+    sizer.add(this.createButtons(), { padding: { top: 20 } });
     sizer.layout();
     sizer.setAlpha(0);
 
@@ -91,7 +92,36 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private createButtonStack() {
-    const buttonStack = this.add.image(0, 0, "scenes.main-menu.button-stack");
+    // const buttonStack = this.add.image(0, 0, "scenes.main-menu.button-stack");
+    const buttonStack = this.add.rexPerspectiveCard({
+      x: 0,
+      y: 0,
+      front: {
+        key: "scenes.main-menu.button-stack"
+      },
+      back: {
+        key: "scenes.main-menu.button-stack"
+      }
+    });
+
+    buttonStack.rotateY = Phaser.Math.DegToRad(180);
+
+    const buttonStackObj = {
+      card: buttonStack,
+      width: buttonStack.width,
+      height: buttonStack.height,
+      isHovered: false,
+      targetRotationX: 0,
+      targetRotationY: 0,
+      currentRotationX: 0,
+      currentRotationY: 0,
+      baseAngleY: 180,
+      isButtonStack: true,
+      x: 0, // Will be set when positioned
+    };
+
+    this.buttons.push(buttonStackObj);
+
     const sizer = this.rexUI.add.sizer({
       width: buttonStack.displayWidth,
       height: buttonStack.displayHeight,
@@ -126,13 +156,29 @@ export class MainMenuScene extends Phaser.Scene {
   // }
 
   private createButton(text: string, index: number, callback?: () => void) {
-    // Create text for the button
-    const textObj = this.add
-      .text(0, 0, text)
-      .setFontSize(34)
-      .setFontFamily("'AtkinsonHyperlegibleNext-Regular'")
-      .setDepth(1)
-      .setColor("#ffffff");
+    // Create a temporary text object to generate textures
+    const tempText = this.add.text(0, 0, text, {
+        fontSize: '34px',
+        fontFamily: "'AtkinsonHyperlegibleNext-Regular'",
+        color: '#ffffff',
+    }).setPadding(5);
+
+    // Generate normal texture
+    if (!this.textures.exists(text)) {
+        const rt = this.make.renderTexture({ width: tempText.width, height: tempText.height }, false);
+        rt.draw(tempText, 0, 0);
+        rt.saveTexture(text);
+    }
+
+    // Generate hover texture (black text)
+    if (!this.textures.exists(`${text}-hover`)) {
+        tempText.setColor('#000000');
+        const rt = this.make.renderTexture({ width: tempText.width, height: tempText.height }, false);
+        rt.draw(tempText, 0, 0);
+        rt.saveTexture(`${text}-hover`);
+    }
+
+    tempText.destroy();
 
     // Get button dimensions from texture
     const buttonTexture = this.textures.get("scenes.main-menu.button");
@@ -153,8 +199,23 @@ export class MainMenuScene extends Phaser.Scene {
       }
     });
 
+    const textTexture = this.textures.get(text);
+    const perspectiveText = this.add.rexPerspectiveCard({
+      x: 0,
+      y: 0,
+      width: textTexture.source[0].width,
+      height: textTexture.source[0].height,
+      front: {
+        key: text
+      },
+      back: {
+        key: text
+      }
+    });
+
     // Set initial rotation to show back face (Y = 180 degrees)
     perspectiveCard.rotateY = Phaser.Math.DegToRad(180);
+    perspectiveText.rotateY = Phaser.Math.DegToRad(180);
 
     // Make perspective card interactive instead of button
     perspectiveCard.setInteractive({ useHandCursor: true });
@@ -162,7 +223,7 @@ export class MainMenuScene extends Phaser.Scene {
     // Store button data for tracking
     const buttonObj = {
       card: perspectiveCard,
-      text: textObj,
+      text: perspectiveText,
       width: buttonWidth,
       height: buttonHeight,
       isHovered: false,
@@ -181,10 +242,11 @@ export class MainMenuScene extends Phaser.Scene {
       buttonObj.isHovered = true;
       // Just change text color and add scale effect for hover feedback
       perspectiveCard.backFace.setTexture("scenes.main-menu.button-hover");
+      perspectiveText.backFace.setTexture(`${text}-hover`);
       perspectiveCard.angleY = 180;
-      textObj.setColor("#000000"); // black text for hover
+      perspectiveText.angleY = 180;
       this.tweens.add({
-        targets: [perspectiveCard, textObj],
+        targets: [perspectiveCard, perspectiveText],
         scaleX: 1.12,
         scaleY: 1.12,
         duration: 200,
@@ -195,10 +257,10 @@ export class MainMenuScene extends Phaser.Scene {
     perspectiveCard.on(Phaser.Input.Events.POINTER_OUT, () => {
       buttonObj.isHovered = false;
       // Reset text color and scale
-      textObj.setColor("#ffffff");
       perspectiveCard.backFace.setTexture("scenes.main-menu.button");
+      perspectiveText.backFace.setTexture(text);
       this.tweens.add({
-        targets: [perspectiveCard, textObj],
+        targets: [perspectiveCard, perspectiveText],
         scaleX: 1,
         scaleY: 1,
         duration: 200,
@@ -217,11 +279,11 @@ export class MainMenuScene extends Phaser.Scene {
 
       // Bring clicked button to front
       perspectiveCard.setDepth(1000);
-      textObj.setDepth(1001);
+      perspectiveText.setDepth(1001);
 
       // Add highlight animation for clicked button
       this.tweens.add({
-        targets: [perspectiveCard, textObj],
+        targets: [perspectiveCard, perspectiveText],
         scaleX: 1.1,
         scaleY: 1.1,
         duration: 200,
@@ -231,7 +293,7 @@ export class MainMenuScene extends Phaser.Scene {
       // Make other buttons stack on the clicked button
       let stackDelay = 0;
       this.buttons.forEach(btn => {
-        if (btn !== buttonObj && !btn.isLogo) {
+        if (btn !== buttonObj && !btn.isLogo && btn.text) {
           // Set lower depth for stacking effect
           btn.card.setDepth(100);
           btn.text.setDepth(101);
@@ -251,22 +313,6 @@ export class MainMenuScene extends Phaser.Scene {
               // Return to original position
               btn.card.setDepth(0).setAlpha(0);
               btn.text.setDepth(0).setAlpha(0);
-              // this.tweens.add({
-              //   targets: [btn.card, btn.text],
-              //   x: btn.x,
-              //   y: btn.y,
-              //   scaleX: 1,
-              //   scaleY: 1,
-              //   alpha: 1,
-              //   duration: 300,
-              //   delay: 200,
-              //   ease: 'Back.easeOut',
-              //   onComplete: () => {
-              //     // Reset depths
-              //     btn.card.setDepth(0);
-              //     btn.text.setDepth(1);
-              //   }
-              // });
             }
           });
           
@@ -277,14 +323,14 @@ export class MainMenuScene extends Phaser.Scene {
       // Reset clicked button
       this.time.delayedCall(800, () => {
         this.tweens.add({
-          targets: [perspectiveCard, textObj],
+          targets: [perspectiveCard, perspectiveText],
           scaleX: 1,
           scaleY: 1,
           duration: 200,
           ease: 'Power2',
           onComplete: () => {
             perspectiveCard.setDepth(0);
-            textObj.setDepth(1);
+            perspectiveText.setDepth(1);
             if (callback) callback();
           }
         });
@@ -303,7 +349,7 @@ export class MainMenuScene extends Phaser.Scene {
       expand: false,
     });
 
-    sizer.add(textObj, {
+    sizer.add(perspectiveText, {
       align: "center",
       expand: false,
       offsetY: -10,
@@ -363,6 +409,44 @@ export class MainMenuScene extends Phaser.Scene {
     return perspectiveLogo;
   }
 
+  private createTitleBackground() {
+    const backgroundTexture = this.textures.get("scenes.main-menu.title-background");
+    const backgroundWidth = backgroundTexture.source[0].width;
+    const backgroundHeight = backgroundTexture.source[0].height;
+
+    const perspectiveTitleBackground = this.add.rexPerspectiveCard({
+      x: this.scale.width / 2,
+      y: this.scale.height / 2,
+      width: backgroundWidth,
+      height: backgroundHeight,
+      front: {
+        key: "scenes.main-menu.title-background"
+      },
+      back: {
+        key: "scenes.main-menu.title-background"
+      }
+    }).setName("title-background");
+
+    perspectiveTitleBackground.rotateY = Phaser.Math.DegToRad(180);
+
+    const titleBackgroundObj = {
+      card: perspectiveTitleBackground,
+      width: backgroundWidth,
+      height: backgroundHeight,
+      isHovered: false,
+      targetRotationX: 0,
+      targetRotationY: 0,
+      currentRotationX: 0,
+      currentRotationY: 0,
+      baseAngleY: 180,
+      x: 0, // Will be set when positioned
+    };
+
+    this.buttons.push(titleBackgroundObj);
+
+    return perspectiveTitleBackground;
+  }
+
   private createButtons() {
     const sizer = this.rexUI.add.sizer({
       space: { item: 30 },
@@ -378,15 +462,47 @@ export class MainMenuScene extends Phaser.Scene {
 
   private createConfigButton(key: string) {
     const sizer = this.rexUI.add.sizer({ orientation: "vertical" });
-    const button = this.add.image(0, 0, key).setAlpha(0.9);
-    button.setInteractive({ useHandCursor: true });
-    button.on(Phaser.Input.Events.POINTER_OVER, () => {
-      button.setAlpha(1);
+    // const button = this.add.image(0, 0, key).setAlpha(0.9);
+    const perspectiveImage = this.add.rexPerspectiveCard({
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      front: {
+        key: key
+      },
+      back: {
+        key: key
+      }
     });
-    button.on(Phaser.Input.Events.POINTER_OUT, () => {
-      button.setAlpha(0.9);
+
+    perspectiveImage.rotateY = Phaser.Math.DegToRad(180);
+
+    const buttonObj = {
+      card: perspectiveImage,
+      width: 100,
+      height: 100,
+      isHovered: false,
+      targetRotationX: 0,
+      targetRotationY: 0,
+      currentRotationX: 0,
+      currentRotationY: 0,
+      baseAngleY: 180,
+      x: 0, // Will be set when positioned
+      y: 0, // Will be set when positioned
+    }
+
+    this.buttons.push(buttonObj);
+
+    perspectiveImage.setInteractive({ useHandCursor: true });
+    perspectiveImage.on(Phaser.Input.Events.POINTER_OVER, () => {
+      buttonObj.isHovered = true;
+      perspectiveImage.angleY = 180;
     });
-    sizer.add(button);
+    perspectiveImage.on(Phaser.Input.Events.POINTER_OUT, () => {
+      buttonObj.isHovered = false;
+    });
+    sizer.add(perspectiveImage);
 
     return sizer;
   }
@@ -429,8 +545,8 @@ export class MainMenuScene extends Phaser.Scene {
     if(this.loading) return;
     const screenWidth = Number(this.scale.width) || Number(this.game.config.width) || 1920;
     const mouseX = Phaser.Math.Clamp(this.mousePosition.x, 0, screenWidth);
-    // Map mouseX (0..screenWidth) to rotation 160..200°
-    const newBaseRotationY = 160 + (mouseX / screenWidth) * 40;
+    // Map mouseX (0..screenWidth) to rotation 170..190°
+    const newBaseRotationY = 170 + (mouseX / screenWidth) * 20;
 
     // Update baseRotationY for each button
     this.buttons.forEach(buttonObj => {
@@ -440,9 +556,15 @@ export class MainMenuScene extends Phaser.Scene {
           // Very subtle rotation for background (only 10% of normal range)
           const reducedRotation = 178 + ((newBaseRotationY - 160) * 0.1);
           buttonObj.card.angleY = reducedRotation;
-        } else {
+        } else if (buttonObj.isButtonStack) {
+          const reducedRotation = 178 + ((newBaseRotationY - 160) * 0.1);
+          buttonObj.card.angleY = reducedRotation;
+        }else {
           buttonObj.card.angleY = newBaseRotationY;
         }
+      }
+      if (buttonObj.text && buttonObj.text.angleY !== undefined && !buttonObj.isHovered) {
+        buttonObj.text.angleY = newBaseRotationY;
       }
     });
   }
