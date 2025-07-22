@@ -105,6 +105,7 @@ export class GameCore {
   }
   
   public static extractCategories() {
+    // Only extract categories from regular questions, not Final Jeopardy
     const uniqueCategories = this.questions.categories;
     this.gameState.categories = uniqueCategories;
   }
@@ -134,9 +135,11 @@ export class GameCore {
   
   public static advanceToNextRound() {
     if (this.gameState.round === "jeopardy") {
-      this.gameState.round = "double-jeopardy";
-      this.gameState.answeredQuestions.clear();
-      this.setupDailyDoubles();
+      this.gameState.round = "final-jeopardy";
+      /** Double jeopardy round setup */
+      // this.gameState.round = "double-jeopardy";
+      // this.gameState.answeredQuestions.clear();
+      // this.setupDailyDoubles();
     } else if (this.gameState.round === "double-jeopardy") {
       this.gameState.round = "final-jeopardy";
     }
@@ -241,16 +244,18 @@ export class GameCore {
   }
   
   public static getAvailableQuestions(): Question[] {
-    const allQuestions = this.questions.data;
-    return allQuestions.filter((question: Question) => {
+    // Only get regular questions that haven't been answered yet, exclude Final Jeopardy
+    const regularQuestions = this.questions.getRegularQuestions();
+    return regularQuestions.filter((question: Question) => {
       const questionId = `${question.category}-${question.price}`;
       return !this.gameState.answeredQuestions.has(questionId);
     });
   }
   
   public static getQuestionByCategory(category: string, value: number): Question | null {
-    const allQuestions = this.questions.data;
-    return allQuestions.find((q: Question) => q.category === category && q.price === value) || null;
+    // Only search in regular questions, exclude Final Jeopardy
+    const regularQuestions = this.questions.getRegularQuestions();
+    return regularQuestions.find((q: Question) => q.category === category && q.price === value) || null;
   }
   
   public static isDailyDouble(category: string, value: number): boolean {
@@ -272,6 +277,10 @@ export class GameCore {
     this.players[playerIndex].score += points;
     this.eventEmitter.emit(GameEvents.SCORE_UPDATED, this.players[playerIndex]);
   }
+
+  public static getRandomFinalJeopardyQuestion(): Question | null {
+    return this.questions.getRandomFinalJeopardyQuestion();
+  }
 }
 
 // Testing purposes
@@ -284,18 +293,18 @@ if (import.meta.env.DEV) {
       answer: "Paris",
       price: 10,
     },
-    {
-      category: "CAPITALS",
-      question: "What is the capital of Spain?",
-      answer: "Madrid",
-      price: 25,
-    },
-    {
-      category: "CAPITALS",
-      question: "What is the capital of Germany?",
-      answer: "Berlin",
-      price: 50,
-    },
+    // {
+    //   category: "CAPITALS",
+    //   question: "What is the capital of Spain?",
+    //   answer: "Madrid",
+    //   price: 25,
+    // },
+    // {
+    //   category: "CAPITALS",
+    //   question: "What is the capital of Germany?",
+    //   answer: "Berlin",
+    //   price: 50,
+    // },
     // {
     //   category: "CAPITALS",
     //   question: "What is the capital of Italy?",
@@ -316,18 +325,18 @@ if (import.meta.env.DEV) {
       answer: "Lionel Messi",
       price: 10,
     },
-    {
-      category: "SPORTS",
-      question: "What is the name of the most popular player in the Brazil?",
-      answer: "Ronaldo",
-      price: 25,
-    },
-    {
-      category: "SPORTS",
-      question: "What is the name of the most popular player in the Portugal?",
-      answer: "Cristiano Ronaldo",
-      price: 50,
-    },
+    // {
+    //   category: "SPORTS",
+    //   question: "What is the name of the most popular player in the Brazil?",
+    //   answer: "Ronaldo",
+    //   price: 25,
+    // },
+    // {
+    //   category: "SPORTS",
+    //   question: "What is the name of the most popular player in the Portugal?",
+    //   answer: "Cristiano Ronaldo",
+    //   price: 50,
+    // },
     // {
     //   category: "SPORTS",
     //   question: "What is the name of the most popular player in the Spain?",
@@ -348,18 +357,18 @@ if (import.meta.env.DEV) {
       answer: "Breaking Bad",
       price: 10,
     },
-    {
-      category: "CINEMA/TV",
-      question: "What is the name of a movie about a man can fly, shoot laser beams with his eyes and is stronger than a human?",
-      answer: "Superman",
-      price: 25,
-    },
-    {
-      category: "CINEMA/TV",
-      question: "What is the name of a TV show about a man with a superpower to run at super speed?",
-      answer: "The Flash",
-      price: 50,
-    },
+    // {
+    //   category: "CINEMA/TV",
+    //   question: "What is the name of a movie about a man can fly, shoot laser beams with his eyes and is stronger than a human?",
+    //   answer: "Superman",
+    //   price: 25,
+    // },
+    // {
+    //   category: "CINEMA/TV",
+    //   question: "What is the name of a TV show about a man with a superpower to run at super speed?",
+    //   answer: "The Flash",
+    //   price: 50,
+    // },
     // {
     //   category: "CINEMA/TV",
     //   question: "What is the name of a movie about a ship diving in the ocean?",
@@ -380,18 +389,18 @@ if (import.meta.env.DEV) {
       answer: "Blue",
       price: 10,
     },
-    {
-      category: "COLORS",
-      question: "What is the color of the sun?",
-      answer: "Yellow",
-      price: 25,
-    },
-    {
-      category: "COLORS",
-      question: "What color you get when you mix red and yellow?",
-      answer: "Orange",
-      price: 50,
-    },
+    // {
+    //   category: "COLORS",
+    //   question: "What is the color of the sun?",
+    //   answer: "Yellow",
+    //   price: 25,
+    // },
+    // {
+    //   category: "COLORS",
+    //   question: "What color you get when you mix red and yellow?",
+    //   answer: "Orange",
+    //   price: 50,
+    // },
     // {
     //   category: "COLORS",
     //   question: "What color you get when you mix blue and red?",
@@ -404,6 +413,43 @@ if (import.meta.env.DEV) {
     //   answer: "Green",
     //   price: 250,
     // },
+
+    // FINAL JEOPARDY QUESTIONS - Using unique categories
+    {
+      category: "FINAL JEOPARDY: WORLD GEOGRAPHY",
+      question: "This South American capital city is located at the second-highest elevation of any capital city in the world.",
+      answer: "La Paz",
+      price: 0,
+      isFinalJeopardy: true
+    },
+    {
+      category: "FINAL JEOPARDY: CHEMISTRY",
+      question: "This element, with the chemical symbol 'Au', has been valued by humans for thousands of years.",
+      answer: "Gold",
+      price: 0,
+      isFinalJeopardy: true
+    },
+    {
+      category: "FINAL JEOPARDY: LITERATURE",
+      question: "This British author wrote '1984' and 'Animal Farm', both dystopian works that remain relevant today.",
+      answer: "George Orwell",
+      price: 0,
+      isFinalJeopardy: true
+    },
+    {
+      category: "FINAL JEOPARDY: CINEMA",
+      question: "This 1972 film about a Mafia family won the Academy Award for Best Picture and launched a legendary trilogy.",
+      answer: "The Godfather",
+      price: 0,
+      isFinalJeopardy: true
+    },
+    {
+      category: "FINAL JEOPARDY: HISTORY",
+      question: "This ancient wonder of the world was located in Alexandria and was one of the largest libraries in the ancient world.",
+      answer: "The Library of Alexandria",
+      price: 0,
+      isFinalJeopardy: true
+    }
   ];
 
   GameCore.questions.setQuestions(questions);

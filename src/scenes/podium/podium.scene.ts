@@ -7,7 +7,9 @@ export interface PodiumSceneData {
     name: string;
     price: number;
   }[];
-  isBuzzed: boolean;
+  isBuzzed?: boolean;
+  isDailyDouble?: boolean;
+  finderIndex?: number;
 }
 
 export class PodiumScene extends Phaser.Scene {
@@ -68,6 +70,11 @@ export class PodiumScene extends Phaser.Scene {
     // Listen for answer phase end
     GameCore.eventEmitter.on(GameEvents.ANSWER_TIME_END, () => {
       this.clearAllIndicators();
+    });
+
+    // Listen for game over to hide podium
+    GameCore.eventEmitter.on(GameEvents.GAME_OVER, () => {
+      this.handleGameOver();
     });
   }
 
@@ -281,6 +288,11 @@ export class PodiumScene extends Phaser.Scene {
     }
   }
 
+  private handleGameOver() {
+    // Stop the podium scene when game is over
+    this.scene.stop();
+  }
+
   destroy() {
     // Clean up event listeners
     GameCore.eventEmitter.removeAllListeners(GameEvents.SCORE_UPDATED);
@@ -288,5 +300,6 @@ export class PodiumScene extends Phaser.Scene {
     GameCore.eventEmitter.removeAllListeners(GameEvents.TURN_CHANGED);
     GameCore.eventEmitter.removeAllListeners(GameEvents.ANSWER_TIME_START);
     GameCore.eventEmitter.removeAllListeners(GameEvents.ANSWER_TIME_END);
+    GameCore.eventEmitter.removeAllListeners(GameEvents.GAME_OVER);
   }
 }

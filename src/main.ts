@@ -15,6 +15,8 @@ import { GameBoardScene } from "./scenes/game-board/game-board.scene";
 import { ChooseQuestionScene } from "./scenes/choose-question/choose-question.scene";
 import { ReplyQuestionScene } from "./scenes/reply-question/reply-question.scene";
 import { ClueCardScene } from "./scenes/clue-card/clue-card.scene";
+import { DailyDoubleScene } from "./scenes/daily-double/daily-double.scene";
+import { FinalJeopardyScene } from "./scenes/final-jeopardy/final-jeopardy.scene";
 import { PodiumScene } from "./scenes/podium/podium.scene";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -39,6 +41,8 @@ document.addEventListener("DOMContentLoaded", () => {
       ChooseQuestionScene,
       ReplyQuestionScene,
       ClueCardScene,
+      DailyDoubleScene,
+      FinalJeopardyScene,
       PodiumScene,
     ],
     plugins: {

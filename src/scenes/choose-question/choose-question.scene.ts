@@ -23,6 +23,14 @@ export class ChooseQuestionScene extends Phaser.Scene {
     this.creator.setup();
     this.services.setup();
     
+    // Check if round is complete before setting up the scene
+    const availableQuestions = GameCore.getAvailableQuestions();
+    if (availableQuestions.length === 0) {
+      console.log("No questions available on scene create, round complete!");
+      this.checkRoundCompletion();
+      return;
+    }
+    
     // Display round information
     this.displayRoundInfo();
     
@@ -118,6 +126,15 @@ export class ChooseQuestionScene extends Phaser.Scene {
   }
 
   private checkPlayerTurn() {
+    // First, check if round is complete before proceeding
+    const availableQuestions = GameCore.getAvailableQuestions();
+    if (availableQuestions.length === 0) {
+      // All questions answered - round complete
+      console.log("No questions available, round complete!");
+      this.checkRoundCompletion();
+      return;
+    }
+
     const currentPlayer = GameCore.getCurrentPlayer();
     this.isAITurn = !currentPlayer.isHuman;
     
@@ -182,6 +199,9 @@ export class ChooseQuestionScene extends Phaser.Scene {
 
   private handleQuestionSelection(question: Question, questionBounds: Phaser.Geom.Rectangle) {
     console.log("Question selected:", question);
+    if(import.meta.env.DEV) {
+    console.log("Question answer:", question.answer);
+    }
     
     // Mark question as answered
     const questionId = `${question.category}-${question.price}`;
@@ -191,8 +211,19 @@ export class ChooseQuestionScene extends Phaser.Scene {
     // Check if this is a Daily Double
     if (GameCore.isDailyDouble(question.category, question.price)) {
       GameCore.eventEmitter.emit(GameEvents.DAILY_DOUBLE_FOUND, { question });
-      // TODO: Handle Daily Double logic
       console.log("Daily Double found!");
+      
+      // Disable all interactions
+      this.services.disableAllInteraction();
+      
+      // Stop podium scene before transitioning to Daily Double
+      this.scene.stop("podium");
+      
+      // Transition to Daily Double scene
+      this.time.delayedCall(200, () => {
+        this.scene.start("daily-double", { question });
+      });
+      return;
     }
     
     // Emit question selected event

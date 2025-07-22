@@ -142,13 +142,34 @@ export class GameScene extends Phaser.Scene {
     GameCore.advanceToNextRound();
     
     if (GameCore.gameState.round === "final-jeopardy") {
-      // TODO: Implement Final Jeopardy scene
       console.log("Starting Final Jeopardy!");
-      this.handleGameOver(); // For now, end the game
+      this.startFinalJeopardy();
     } else {
       // Continue to next round
       this.scene.start("choose-question");
     }
+  }
+
+  private startFinalJeopardy() {
+    const finalQuestion = GameCore.getRandomFinalJeopardyQuestion();
+    
+    if (!finalQuestion) {
+      console.warn("No Final Jeopardy questions available!");
+      this.handleGameOver();
+      return;
+    }
+
+    // Check if any players are eligible (score > 0)
+    const eligiblePlayers = GameCore.players.filter(player => player.score > 0);
+    
+    if (eligiblePlayers.length === 0) {
+      console.log("No players eligible for Final Jeopardy!");
+      this.handleGameOver();
+      return;
+    }
+
+    // Launch Final Jeopardy scene
+    this.scene.start("final-jeopardy", { question: finalQuestion });
   }
 
   private handleGameOver() {
@@ -169,7 +190,7 @@ export class GameScene extends Phaser.Scene {
     // Show winner
     this.add.text(width / 2, height / 2 - 100, 
       `Game Over!\n${winner.name} wins with $${winner.score}!`, {
-        fontSize: '64px',
+        fontSize: '80px',
         color: '#ffffff',
         fontFamily: "'Swiss 911 Ultra Compressed BT'",
         align: 'center'
@@ -185,7 +206,7 @@ export class GameScene extends Phaser.Scene {
       });
 
     this.add.text(width / 2, height / 2 + 100, scoreText, {
-      fontSize: '32px',
+      fontSize: '40px',
       color: '#ffffff',
       fontFamily: "'Swiss 911 Ultra Compressed BT'",
       align: 'center'

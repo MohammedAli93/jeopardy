@@ -7,6 +7,9 @@ import { AICore } from "../../core/game/ai-core";
 export interface ClueCardSceneData {
   question: Question;
   questionBounds: Phaser.Geom.Rectangle;
+  isDailyDouble?: boolean;
+  wagerAmount?: number;
+  finderPlayerIndex?: number;
 }
 
 export class ClueCardScene extends Phaser.Scene {
@@ -115,18 +118,33 @@ export class ClueCardScene extends Phaser.Scene {
     this.buzzingPhase = true;
     
     GameCore.buzzingState.questionReadComplete = true;
-    GameCore.startBuzzing();
-    
     GameCore.eventEmitter.emit(GameEvents.QUESTION_READ_COMPLETE);
-    GameCore.eventEmitter.emit(GameEvents.BUZZING_ENABLED);
     
-    // Update instruction
-    this.creator.updateInstructionText("Press SPACEBAR to buzz in!", '#00ff00');
-
     const questionDisplay = this.children.getByName('question-display') as Phaser.GameObjects.Text;
     if (questionDisplay) {
       questionDisplay.setText("");
     }
+    
+    // Handle Daily Double - no buzzing, only the finder answers
+    if (this.questionData!.isDailyDouble) {
+      const finderIndex = this.questionData!.finderPlayerIndex!;
+      const finderPlayer = GameCore.players[finderIndex];
+      
+      this.creator.updateInstructionText(`${finderPlayer.name} will now answer the Daily Double!`, '#ffff00');
+      
+      // Automatically start answer phase for the finder
+      this.time.delayedCall(1000, () => {
+        this.startAnswerPhase(finderIndex);
+      });
+      return;
+    }
+    
+    // Regular buzzing logic
+    GameCore.startBuzzing();
+    GameCore.eventEmitter.emit(GameEvents.BUZZING_ENABLED);
+    
+    // Update instruction
+    this.creator.updateInstructionText("Press SPACEBAR to buzz in!", '#00ff00');
     
     // Start 8-second buzzing timer
     this.startBuzzingTimer();
@@ -225,13 +243,13 @@ export class ClueCardScene extends Phaser.Scene {
       this.cancelAllTimers();
       
       // Update instruction
-      this.creator.updateInstructionText("No one buzzed! Moving to next question...", '#ff0000');
+      this.creator.updateInstructionText("Time's up! No one buzzed. Here's the correct answer:", '#ff0000');
       
       // Show correct answer
       this.showCorrectAnswer();
       
-      // Return to question board after delay
-      this.time.delayedCall(3000, () => {
+      // Return to question board after delay - give time to read the answer
+      this.time.delayedCall(4000, () => {
         this.returnToQuestionBoard();
       });
     }
@@ -249,6 +267,14 @@ export class ClueCardScene extends Phaser.Scene {
     }
     
     const humanPlayerIndex = GameCore.players.findIndex(p => p.isHuman);
+    
+    // Check if human player already buzzed for this question
+    if (GameCore.buzzingState.buzzOrder.includes(humanPlayerIndex)) {
+      // Show message that they already tried
+      this.creator.updateInstructionText("You already tried to answer this question!", '#ff0000');
+      return;
+    }
+    
     const success = GameCore.playerBuzz(humanPlayerIndex);
     
     if (success) {
@@ -263,6 +289,11 @@ export class ClueCardScene extends Phaser.Scene {
   private handleAIBuzz(playerIndex: number) {
     if (!GameCore.buzzingState.isBuzzingActive || !this.buzzingPhase || this.someoneBuzzed) {
       return; // Someone already buzzed or buzzing not active
+    }
+    
+    // Check if this AI player already buzzed for this question
+    if (GameCore.buzzingState.buzzOrder.includes(playerIndex)) {
+      return; // This player already tried
     }
     
     const success = GameCore.playerBuzz(playerIndex);
@@ -387,7 +418,7 @@ export class ClueCardScene extends Phaser.Scene {
 
   private showAnswerInput() {
     // Create answer input UI
-    const { inputBg, prompt, inputText } = this.creator.createAnswerInput();
+    const { inputText } = this.creator.createAnswerInput();
     
     // Track current input
     let currentInput = "";
@@ -486,6 +517,32 @@ export class ClueCardScene extends Phaser.Scene {
     const player = GameCore.players[playerIndex];
     const question = this.questionData!.question;
     
+    // Handle Daily Double scoring
+    if (this.questionData!.isDailyDouble) {
+      const wager = this.questionData!.wagerAmount || question.price;
+      const finderIndex = this.questionData!.finderPlayerIndex!;
+      
+      // Only the finder can answer in Daily Double
+      if (playerIndex === finderIndex) {
+        if (isCorrect) {
+          player.score += wager;
+          GameCore.gameState.currentPlayerIndex = playerIndex; // Keep same player for next selection
+        } else {
+          player.score -= wager;
+        }
+        
+        GameCore.eventEmitter.emit(GameEvents.SCORE_UPDATED, player);
+        this.showResultMessage(isCorrect, question.answer);
+        
+        // Return to question selection after delay
+        this.time.delayedCall(3000, () => {
+          this.returnToQuestionBoard();
+        });
+      }
+      return;
+    }
+    
+    // Regular question scoring
     if (isCorrect) {
       player.score += question.price;
       // Correct answerer gets to pick next question
@@ -498,15 +555,20 @@ export class ClueCardScene extends Phaser.Scene {
       player.score -= question.price;
       GameCore.eventEmitter.emit(GameEvents.SCORE_UPDATED, player);
       
-      // If this was the first wrong answer, allow others to buzz
-      if (GameCore.buzzingState.buzzOrder.length === 1) {
-        this.showResultMessage(false, question.answer);
+      // Check if there are other players who haven't tried yet
+      const remainingPlayers = GameCore.players.filter((_, index) => 
+        !GameCore.buzzingState.buzzOrder.includes(index)
+      );
+      
+      if (remainingPlayers.length > 0) {
+        // Show wrong answer and allow others to buzz
+        this.showResultMessage(false, "Incorrect!");
         this.time.delayedCall(2000, () => {
           this.allowRebuzzing();
         });
         return;
       } else {
-        // Show correct answer and continue
+        // No more players to try, show correct answer and continue
         this.showResultMessage(false, question.answer);
       }
     }
@@ -518,8 +580,27 @@ export class ClueCardScene extends Phaser.Scene {
   }
 
   private allowRebuzzing() {
-    // Reset buzzing for remaining players
+    // Check if there are any players left who haven't buzzed
+    const remainingPlayers = GameCore.players.filter((_, index) => 
+      !GameCore.buzzingState.buzzOrder.includes(index)
+    );
+    
+    if (remainingPlayers.length === 0) {
+      // No more players to buzz, show correct answer and continue
+      this.buzzingPhase = false;
+      this.creator.updateInstructionText("No more players can buzz. Showing correct answer...", '#ff0000');
+      this.showCorrectAnswer();
+      
+      this.time.delayedCall(3000, () => {
+        this.returnToQuestionBoard();
+      });
+      return;
+    }
+    
+    // Reset buzzing state but keep track of players who already answered
+    const previousBuzzOrder = [...GameCore.buzzingState.buzzOrder];
     GameCore.resetBuzzing();
+    GameCore.buzzingState.buzzOrder = previousBuzzOrder; // Restore the buzz order to prevent re-buzzing
     GameCore.buzzingState.questionReadComplete = true;
     GameCore.startBuzzing();
     
@@ -529,12 +610,59 @@ export class ClueCardScene extends Phaser.Scene {
     // Hide the single player podium
     this.scene.stop("podium");
     
-    // Update instruction
-    this.creator.updateInstructionText("Press SPACEBAR to buzz in!", '#00ff00');
+    // Update instruction to show remaining players
+    const remainingPlayerNames = remainingPlayers.map(p => p.name).join(", ");
+    this.creator.updateInstructionText(`Remaining players (${remainingPlayerNames}) can buzz in!`, '#00ff00');
     
-    // Start new buzzing timer
+    // Start new buzzing timer (shorter since some players already tried)
     this.startBuzzingTimer();
-    this.startAIBuzzAttempts();
+    
+    // Only start AI buzz attempts for players who haven't tried yet
+    this.startAIBuzzAttemptsForRemainingPlayers();
+  }
+
+  private startAIBuzzAttemptsForRemainingPlayers() {
+    // Start AI buzz attempts only for players who haven't buzzed yet
+    GameCore.getAIPlayers().forEach((aiPlayer) => {
+      const playerIndex = GameCore.players.indexOf(aiPlayer);
+      
+      // Skip if this player already buzzed
+      if (GameCore.buzzingState.buzzOrder.includes(playerIndex)) {
+        console.log(`AI Player ${aiPlayer.name} (index ${playerIndex}) already buzzed, skipping`);
+        return;
+      }
+      
+      console.log(`AI Player ${aiPlayer.name} (index ${playerIndex}) is eligible to buzz again`);
+      
+      const buzzTimerData = (aiPlayer as any).buzzTimerData;
+      if (buzzTimerData) {
+        // Shorter delays for remaining attempts
+        let adjustedDelay = buzzTimerData.delay * 0.7; // Make it 30% faster
+        
+        // Adjust delay based on difficulty but keep within 1-5 second range
+        switch (aiPlayer.difficulty) {
+          case "easy":
+            adjustedDelay = 2000 + Math.random() * 3000; // 2-5 seconds
+            break;
+          case "medium":
+            adjustedDelay = 1500 + Math.random() * 2500; // 1.5-4 seconds
+            break;
+          case "hard":
+            adjustedDelay = 800 + Math.random() * 2200; // 0.8-3 seconds
+            break;
+        }
+        
+        const timer = this.time.delayedCall(adjustedDelay, () => {
+          // Double-check the player hasn't buzzed since timer was created
+          if (this.buzzingPhase && !this.someoneBuzzed && !GameCore.buzzingState.buzzOrder.includes(playerIndex)) {
+            console.log(`AI Player ${aiPlayer.name} attempting to buzz`);
+            this.handleAIBuzz(playerIndex);
+          }
+        });
+        
+        this.aiBuzzTimers.push(timer);
+      }
+    });
   }
 
   private checkAnswer(playerAnswer: string, question: Question): boolean {

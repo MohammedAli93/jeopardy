@@ -2,7 +2,6 @@ import type GridSizer from "phaser3-rex-plugins/templates/ui/gridsizer/GridSizer
 import { GameCore } from "../../core/game/game-core";
 import { fitToSize } from "../../utils/size";
 import type { ChooseQuestionScene } from "./choose-question.scene";
-import { InputComponent } from "../../components/input";
 
 const CELL_PADDING = 16;
 const CATEGORIES_AND_QUESTIONS_Y_SEPARATION = 31; // Separation between the categories and the questions.
