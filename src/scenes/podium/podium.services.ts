@@ -75,6 +75,17 @@ export class PodiumSceneServices {
     // const tweens: Promise<Phaser.Tweens.Tween>[] = [];
     const children = timerUnitContainer.sizerChildren;
     timerUnitAnimation(children, (child) => {
+      return new Promise((resolve) => {
+        this.scene.tweens.add({
+          targets: child,
+          props: { alpha: 0, scale: 0 },
+          duration: 1000,
+          onComplete: () => {
+            resolve(undefined);
+            child.destroy();
+          },
+        });
+      }); 
     });
     // for (let i = 0; i < children.length; i++) {
     //   const timerUnit = children[i];
@@ -106,6 +117,7 @@ function timerUnitAnimation<T>(children: T[], callback?: (child: T) => Promise<v
   let endIndex = children.length - 1;
   while (startIndex != endIndex) {
     const child = children[startIndex];
+    callback?.(child);
     startIndex++;
     endIndex--;
   }

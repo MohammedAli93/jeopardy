@@ -122,8 +122,11 @@ export class LoadingScene extends Phaser.Scene {
         // this.scene.bringToTop("hud");
         this.fullLoaded.assets = false;
         // this.scene.start("main-menu");
-        // this.scene.start("game");
-        this.scene.start("game-board");
+        this.scene.start("game", {
+          gameMode: "single-player",
+          podiums: [{ name: "Morgan", price: 0 }, { name: "You", price: 0 }, { name: "Jessica", price: 0 }],
+        });
+        // this.scene.start("game-board");
         // this.scene.start("choose-question");
         // this.scene.start("reply-question", { question: GameCore.questions.getQuestionsByCategory("Capitals")[0] });
       }
