@@ -16,9 +16,12 @@ export class MainMenuScene extends Phaser.Scene {
     this.scene.bringToTop("hud");
 
     // Background with parallax scroll effect
-    const backgroundImage = this.add.image(width / 2, height / 2, "scenes.main-menu.background")
+    // const backgroundImage = this.add.image(width / 2, height / 2, "scenes.main-menu.background")
+    const backgroundImage = this.add.video(width / 2, height / 2, "scenes.main-menu.background-video")
     .setName("background-image");
-    backgroundImage.setDisplaySize(width * 2, height * 1.8); // Make it wider for scrolling
+    backgroundImage.play(true);
+    backgroundImage.setScale(2);
+    // backgroundImage.setDisplaySize(width * 2, height * 1.8); // Make it wider for scrolling
     backgroundImage.setDepth(-1);
 
 
@@ -138,7 +141,7 @@ export class MainMenuScene extends Phaser.Scene {
     sizer.addSpace();
     sizer.add(
       this.createButton("Single Player", 0, () => {
-        this.scene.start("game")
+        this.scene.start("new-game-board")
       })
     );
     sizer.add(this.createButton("Multiplayer", 1));

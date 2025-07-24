@@ -22,7 +22,7 @@ export class HudSceneCreator {
 
     sizer.addBackground(
       this.scene.rexUI.add.ninePatch2({
-        key: "scenes.hub.window",
+        key: "scenes.hub.background",
         columns: [15, undefined, 15],
         rows: [15, undefined, 15],
       })
@@ -42,12 +42,14 @@ export class HudSceneCreator {
     sizer.add(this.scene.add.image(0, 0, "scenes.hub.ok"));
 
     sizer.add(this.createText("Mic"), { padding: { left: 50 } });
-    sizer.add(this.scene.add.image(0, 0, "scenes.hub.mic"));
+    sizer.add(this.scene.add.image(0, 0, "scenes.hub.mic").setName("mic-button"));
 
     sizer.add(this.createText("Back"), { padding: { left: 50 } });
-    sizer.add(this.scene.add.image(0, 0, "scenes.hub.back"));
+    sizer.add(this.scene.add.image(0, 0, "scenes.hub.back").setName("back-button"));
 
     sizer.layout();
+    sizer.setName("hud");
+    sizer.setAlpha(0);
   }
 
   private createText(text: string) {

@@ -24,6 +24,7 @@ export class LoadingScene extends Phaser.Scene {
 
     // this.load.video("background-video", "background.mp4", true);
     this.load.image("background", "background.webp");
+    this.load.video("background-video", "background.mp4", true);
     this.load.image("title-background", "title-background.webp");
     this.load.image("logo", "logo.webp");
     this.load.image("button-stack", "button-stack.webp");
@@ -52,6 +53,22 @@ export class LoadingScene extends Phaser.Scene {
     this.load.image("jeopardy-large-logo", "jeopardy-large-logo.jpg");
     this.load.image("background", "background.jpg");
     this.load.image("card", "card.jpg");
+
+    // New Game Board
+    this.load.setPath("assets/scenes/new-game-board");
+    this.load.setPrefix("scenes.new-game-board.");
+
+    this.load.image("background", "background.png");
+    this.load.image("questions-background", "questions-background.png");
+    this.load.image("question-background", "question-background.png");
+    this.load.image("category-background", "category-background.png");
+
+    // Listening
+    this.load.image("listening-background", "listening-background.png");
+    this.load.image("brand-icon", "brand-icon.png");
+    this.load.image("close-icon", "close-icon.png");
+    this.load.image("ok-icon", "ok-icon.png");
+    this.load.video("listening-effect", "listening-effect.mp4", true);
 
     // Choose Question
     this.load.setPath("assets/scenes/choose-question");
@@ -89,6 +106,7 @@ export class LoadingScene extends Phaser.Scene {
     this.load.image("ok", "ok.webp");
     this.load.image("mic", "mic.webp");
     this.load.image("back", "back.webp");
+    this.load.image("background", "background.webp");
 
     // Input
     this.load.setPath("assets/components/input");
@@ -121,9 +139,10 @@ export class LoadingScene extends Phaser.Scene {
         // this.scene.launch("hud");
         // this.scene.bringToTop("hud");
         this.fullLoaded.assets = false;
-        // this.scene.start("main-menu");
+        this.scene.start("main-menu");
         // this.scene.start("game");
-        this.scene.start("game-board");
+        // this.scene.start("game-board");
+        // this.scene.start("new-game-board");
         // this.scene.start("choose-question");
         // this.scene.start("reply-question", { question: GameCore.questions.getQuestionsByCategory("Capitals")[0] });
       }

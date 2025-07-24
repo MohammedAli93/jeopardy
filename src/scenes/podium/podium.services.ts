@@ -74,8 +74,8 @@ export class PodiumSceneServices {
 
     // const tweens: Promise<Phaser.Tweens.Tween>[] = [];
     const children = timerUnitContainer.sizerChildren;
-    timerUnitAnimation(children, (child) => {
-    });
+    // timerUnitAnimation(children, (_child) => {
+    // });
     // for (let i = 0; i < children.length; i++) {
     //   const timerUnit = children[i];
       

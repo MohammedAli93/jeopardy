@@ -12,6 +12,7 @@ import { MainMenuScene } from "./scenes/main-menu/main-menu.scene";
 import { HudScene } from "./scenes/hud/hud.scene";
 import { GameScene } from "./scenes/game/game.scene";
 import { GameBoardScene } from "./scenes/game-board/game-board.scene";
+import { NewGameBoardScene } from "./scenes/new-game-board/new-game-board.scene";
 import { ChooseQuestionScene } from "./scenes/choose-question/choose-question.scene";
 import { ReplyQuestionScene } from "./scenes/reply-question/reply-question.scene";
 import { ClueCardScene } from "./scenes/clue-card/clue-card.scene";
@@ -36,6 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
       HudScene,
       GameScene,
       GameBoardScene,
+      NewGameBoardScene,
       ChooseQuestionScene,
       ReplyQuestionScene,
       ClueCardScene,
