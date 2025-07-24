@@ -28,8 +28,8 @@ export class LoadingScene extends Phaser.Scene {
     this.load.image("title-background", "title-background.webp");
     this.load.image("logo", "logo.webp");
     this.load.image("button-stack", "button-stack.webp");
-    this.load.image("button", "button.webp");
-    this.load.image("button-hover", "button-hover.webp");
+    this.load.image("button", "button.png");
+    this.load.image("button-hover", "button-hover.png");
     this.load.image("divider-h", "divider-h.png");
     this.load.image("button-settings", "button-settings.webp");
     this.load.image("button-saves", "button-saves.webp");
@@ -138,8 +138,8 @@ export class LoadingScene extends Phaser.Scene {
       if (import.meta.env.DEV) {
         // this.scene.launch("hud");
         // this.scene.bringToTop("hud");
-        this.fullLoaded.assets = false;
-        this.scene.start("main-menu");
+        // this.fullLoaded.assets = false;
+        // this.scene.start("main-menu");
         // this.scene.start("game");
         // this.scene.start("game-board");
         // this.scene.start("new-game-board");

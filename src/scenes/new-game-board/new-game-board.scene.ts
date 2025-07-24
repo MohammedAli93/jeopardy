@@ -5,6 +5,7 @@ import type { Question } from "../../core/game/models/questions.model";
 import { InputComponent } from "../../components/input";
 import type { HudScene } from "../hud/hud.scene";
 import { GameStateManager } from "../../core/game/game-state-manager";
+import type Sizer from "phaser3-rex-plugins/templates/ui/sizer/Sizer";
 
 export class NewGameBoardScene extends Phaser.Scene {
   public creator: GameBoardSceneCreator;
@@ -28,6 +29,15 @@ export class NewGameBoardScene extends Phaser.Scene {
 
     // Initialize the state manager
     this.stateManager = GameStateManager.getInstance(this.game.events);
+
+    const mainContainer = this.children.getByName("main-container") as Sizer;
+    mainContainer.setAlpha(0);
+    this.tweens.add({
+      targets: mainContainer,
+      alpha: 1,
+      duration: 1000,
+      ease: "power2.inOut",
+    });
 
     // Wait for HUD to be ready, then register components with state manager
     this.time.delayedCall(1000, () => {

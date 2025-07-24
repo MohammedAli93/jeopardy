@@ -12,6 +12,11 @@ export class MainMenuScene extends Phaser.Scene {
 
   async create() {
     const { width, height } = this.scale;
+    
+    // Initialize mouse position to center of screen to start cards straight at 180°
+    this.mousePosition.x = width / 2;
+    this.mousePosition.y = height / 2;
+    
     this.scene.launch("hud");
     this.scene.bringToTop("hud");
 
@@ -20,7 +25,7 @@ export class MainMenuScene extends Phaser.Scene {
     const backgroundImage = this.add.video(width / 2, height / 2, "scenes.main-menu.background-video")
     .setName("background-image");
     backgroundImage.play(true);
-    backgroundImage.setScale(2);
+    backgroundImage.setScale(1.3, 1);
     // backgroundImage.setDisplaySize(width * 2, height * 1.8); // Make it wider for scrolling
     backgroundImage.setDepth(-1);
 
@@ -34,6 +39,7 @@ export class MainMenuScene extends Phaser.Scene {
     // );
     // titleBackground.setAlpha(0).setName("title-background");
     const titleBackground = this.createTitleBackground();
+    titleBackground.setAlpha(0);
 
     const sizer = this.rexUI.add.sizer({
       orientation: "vertical",
@@ -86,11 +92,11 @@ export class MainMenuScene extends Phaser.Scene {
     // this.cameras.main.setBounds(0, 0, 1920, 1080);
 
     // Setup mouse tracking for perspective animation
-    this.setupMouseTracking();
-
+    
     // [TEMP] We don't have a start button for now, so let's just wait 5 seconds and start the game.
     this.time.delayedCall(1500, () => {
       this.loading = false;
+      this.setupMouseTracking();
     });
   }
 
@@ -161,7 +167,7 @@ export class MainMenuScene extends Phaser.Scene {
   private createButton(text: string, index: number, callback?: () => void) {
     // Create a temporary text object to generate textures
     const tempText = this.add.text(0, 0, text, {
-        fontSize: '34px',
+        fontSize: '40px',
         fontFamily: "'AtkinsonHyperlegibleNext-Regular'",
         color: '#ffffff',
     }).setPadding(5);
@@ -528,7 +534,7 @@ export class MainMenuScene extends Phaser.Scene {
       
       // Calculate the scroll offset based on mouse position
       // mouseX ranges from 0 to screenWidth, we want to move the background by a maximum of width/2 in either direction
-      const scrollRange = screenWidth / 4; // How far the background can move from center
+      const scrollRange = screenWidth / 8; // Reduced from /4 to /8 for more subtle movement
       const scrollOffset = ((mouseX / screenWidth) - 0.5) * scrollRange * 2;
       
       // Smoothly update the background position
@@ -557,7 +563,7 @@ export class MainMenuScene extends Phaser.Scene {
         // Apply reduced effect for background
         if (buttonObj.isBackground) {
           // Very subtle rotation for background (only 10% of normal range)
-          const reducedRotation = 178 + ((newBaseRotationY - 160) * 0.1);
+          const reducedRotation = 179 + ((newBaseRotationY - 175) * 0.1);
           buttonObj.card.angleY = reducedRotation;
         } else if (buttonObj.isButtonStack) {
           const reducedRotation = 178 + ((newBaseRotationY - 160) * 0.1);
