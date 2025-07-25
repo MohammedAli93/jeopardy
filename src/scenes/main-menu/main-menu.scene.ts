@@ -1,4 +1,5 @@
 import type OverlapSizer from "phaser3-rex-plugins/templates/ui/overlapsizer/OverlapSizer";
+import { convert2DTo3D, update3DGameObject } from "../../utils/3d";
 
 export class MainMenuScene extends Phaser.Scene {
   // private cameraTween?: Phaser.Tweens.Tween;
@@ -34,12 +35,8 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Add background to tracking
     // Title Background
-    const titleBackground = this.add.image(
-      width / 2,
-      height / 2,
-      "scenes.main-menu.title-background"
-    );
-    titleBackground.setAlpha(0).setName("title-background");
+    const titleBackground = this.createTitleBackground();
+    titleBackground.setAlpha(0);
 
     const sizer = this.rexUI.add.sizer({
       orientation: "vertical",
@@ -52,7 +49,6 @@ export class MainMenuScene extends Phaser.Scene {
     sizer.add(this.add.image(0, 0, "scenes.main-menu.logo-header"), { padding: { bottom: 60 } });
     const title = this.createPerspectiveLogo();
 
-    sizer.addBackground(titleBackground);
     sizer.add(title, { padding: { bottom: 40 } });
     sizer.add(this.add.image(0, 0, "scenes.main-menu.divider-h"));
     sizer.add(this.createButtonStack());
@@ -109,6 +105,44 @@ export class MainMenuScene extends Phaser.Scene {
       tabButton.emit("focus", true);
       otherTabButtons.forEach((tab) => tab.emit("focus", false));
     });
+  }
+
+  private createTitleBackground() {
+    const backgroundTexture = this.textures.get("scenes.main-menu.title-background");
+    const backgroundWidth = backgroundTexture.source[0].width;
+    const backgroundHeight = backgroundTexture.source[0].height;
+
+    const perspectiveTitleBackground = this.add.rexPerspectiveCard({
+      x: this.scale.width / 2,
+      y: this.scale.height / 2,
+      width: backgroundWidth,
+      height: backgroundHeight,
+      front: {
+        key: "scenes.main-menu.title-background"
+      },
+      back: {
+        key: "scenes.main-menu.title-background"
+      }
+    }).setName("title-background");
+
+    perspectiveTitleBackground.rotateY = Phaser.Math.DegToRad(180);
+
+    const titleBackgroundObj = {
+      card: perspectiveTitleBackground,
+      width: backgroundWidth,
+      height: backgroundHeight,
+      isHovered: false,
+      targetRotationX: 0,
+      targetRotationY: 0,
+      currentRotationX: 0,
+      currentRotationY: 0,
+      baseAngleY: 180,
+      x: 0, // Will be set when positioned
+    };
+
+    this.buttons.push(titleBackgroundObj);
+
+    return perspectiveTitleBackground;
   }
 
   private createButtonStack() {
@@ -233,12 +267,9 @@ export class MainMenuScene extends Phaser.Scene {
     // Add original hover/out/click functionality with perspective animation
     perspectiveCard.on(Phaser.Input.Events.POINTER_OVER, () => {
       this.tabButtons.forEach((tab) => tab.emit("focus", false));
-      buttonObj.isHovered = true;
       // Just change text color and add scale effect for hover feedback
       perspectiveCard.backFace.setTexture("scenes.main-menu.button-hover");
       perspectiveText.backFace.setTexture(`${text}-hover`);
-      perspectiveCard.angleY = 180;
-      perspectiveText.angleY = 180;
       this.tweens.add({
         targets: [perspectiveCard, perspectiveText],
         scaleX: 1.12,
@@ -476,12 +507,18 @@ export class MainMenuScene extends Phaser.Scene {
   private updateGlobalCardRotation() {
     if(this.loading) return;
     const screenWidth = Number(this.scale.width) || Number(this.game.config.width) || 1920;
+    const screenHeight = Number(this.scale.height) || Number(this.game.config.height) || 1080;
     const mouseX = Phaser.Math.Clamp(this.mousePosition.x, 0, screenWidth);
+    const mouseY = Phaser.Math.Clamp(this.mousePosition.y, 0, screenHeight);
     // Map mouseX (0..screenWidth) to rotation 170..190°
+    const newBaseRotationX = (-10 + (mouseY / screenHeight) * 20) * -1;
     const newBaseRotationY = 170 + (mouseX / screenWidth) * 20;
 
     // Update baseRotationY for each button
+    const titleBackground = this.children.getByName("title-background") as Phaser.GameObjects.Image;
+    // console.log(mouseX)
     this.buttons.forEach(buttonObj => {
+      // AngleY
       if (buttonObj.card && buttonObj.card.angleY !== undefined && !buttonObj.isHovered) {
         // Apply reduced effect for background
         if (buttonObj.isBackground) {
@@ -498,6 +535,30 @@ export class MainMenuScene extends Phaser.Scene {
       if (buttonObj.text && buttonObj.text.angleY !== undefined && !buttonObj.isHovered) {
         buttonObj.text.angleY = newBaseRotationY;
       }
+
+      // AngleX
+      if (buttonObj.card && buttonObj.card.angleX !== undefined && !buttonObj.isHovered) {
+        buttonObj.card.angleX = newBaseRotationX;
+      }
+      if (buttonObj.text && buttonObj.text.angleX !== undefined && !buttonObj.isHovered) {
+        buttonObj.text.angleX = newBaseRotationX;
+      }
+      
+      if (buttonObj.card === titleBackground) return;
+      this.update3DCardPosition(buttonObj.card);
+      if (buttonObj.text) this.update3DCardPosition(buttonObj.text);
     });
+  }
+  private update3DCardPosition(gameObject: any) {
+    const screenWidth = Number(this.scale.width) || Number(this.game.config.width) || 1920;
+    const screenHeight = Number(this.scale.height) || Number(this.game.config.height) || 1080;
+    const factorX = (((gameObject.angleX * -1) + 10) / 20) * 2 - 1;
+    const factorY = ((gameObject.angleY - 170) / 20) * 2 - 1;
+    let initialPosition = gameObject.getData("initial-position");
+    if (!initialPosition) {
+      initialPosition = convert2DTo3D({ x: gameObject.x, y: gameObject.y}, screenWidth, screenHeight);
+      gameObject.setData("initial-position", initialPosition);
+    }
+    update3DGameObject(gameObject, { x: initialPosition.x, y: initialPosition.y, z: 0 }, { x: -0.225 * factorY, y: (0.225 / 2) * factorX, z: -1 });
   }
 }
