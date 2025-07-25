@@ -68,7 +68,7 @@ export class LoadingScene extends Phaser.Scene {
     this.load.image("category-background", "category-background.png");
 
     // Listening
-    this.load.image("listening-background", "listening-background.png");
+    this.load.image("listening-background", "listening-background.webp");
     this.load.image("brand-icon", "brand-icon.png");
     this.load.image("close-icon", "close-icon.png");
     this.load.image("ok-icon", "ok-icon.png");

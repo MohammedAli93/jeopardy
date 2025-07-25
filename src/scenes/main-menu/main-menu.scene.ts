@@ -46,7 +46,7 @@ export class MainMenuScene extends Phaser.Scene {
     });
 
     // Title - Create perspective logo
-    sizer.add(this.add.image(0, 0, "scenes.main-menu.logo-header"), { padding: { bottom: 60 } });
+    sizer.add(this.add.image(0, 0, "scenes.main-menu.logo-header"), { padding: { bottom: 60,top: 30 } });
     const title = this.createPerspectiveLogo();
 
     sizer.add(title, { padding: { bottom: 40 } });
@@ -125,22 +125,22 @@ export class MainMenuScene extends Phaser.Scene {
       }
     }).setName("title-background");
 
-    perspectiveTitleBackground.rotateY = Phaser.Math.DegToRad(180);
+    // perspectiveTitleBackground.rotateY = Phaser.Math.DegToRad(180);
 
-    const titleBackgroundObj = {
-      card: perspectiveTitleBackground,
-      width: backgroundWidth,
-      height: backgroundHeight,
-      isHovered: false,
-      targetRotationX: 0,
-      targetRotationY: 0,
-      currentRotationX: 0,
-      currentRotationY: 0,
-      baseAngleY: 180,
-      x: 0, // Will be set when positioned
-    };
+    // const titleBackgroundObj = {
+    //   card: perspectiveTitleBackground,
+    //   width: backgroundWidth,
+    //   height: backgroundHeight,
+    //   isHovered: false,
+    //   targetRotationX: 0,
+    //   targetRotationY: 0,
+    //   currentRotationX: 0,
+    //   currentRotationY: 0,
+    //   baseAngleY: 180,
+    //   x: 0, // Will be set when positioned
+    // };
 
-    this.buttons.push(titleBackgroundObj);
+    // this.buttons.push(titleBackgroundObj);
 
     return perspectiveTitleBackground;
   }
@@ -455,7 +455,7 @@ export class MainMenuScene extends Phaser.Scene {
       y: 0, // Will be set when positioned
     }
 
-    this.buttons.push(buttonObj);
+    // this.buttons.push(buttonObj);
 
     perspectiveImage.setInteractive({ useHandCursor: true });
     perspectiveImage.on(Phaser.Input.Events.POINTER_OVER, () => {
