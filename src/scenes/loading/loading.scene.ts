@@ -27,6 +27,7 @@ export class LoadingScene extends Phaser.Scene {
     this.load.video("background-video", "background.mp4", true);
     this.load.image("title-background", "title-background.webp");
     this.load.image("logo", "logo.webp");
+    this.load.image("logo-header", "logo-header.webp");
     this.load.image("button-stack", "button-stack.webp");
     this.load.image("button", "button.png");
     this.load.image("button-hover", "button-hover.png");
