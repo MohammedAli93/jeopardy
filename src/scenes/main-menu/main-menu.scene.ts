@@ -49,13 +49,14 @@ export class MainMenuScene extends Phaser.Scene {
     });
 
     // Title - Create perspective logo
-    sizer.add(this.add.image(0, 0, "scenes.main-menu.logo-header"));
+    sizer.add(this.add.image(0, 0, "scenes.main-menu.logo-header"), { padding: { bottom: 60 } });
     const title = this.createPerspectiveLogo();
 
     sizer.addBackground(titleBackground);
-    sizer.add(title);
+    sizer.add(title, { padding: { bottom: 40 } });
+    sizer.add(this.add.image(0, 0, "scenes.main-menu.divider-h"));
     sizer.add(this.createButtonStack());
-    // sizer.add(this.add.image(0, 0, "scenes.main-menu.divider-h"));
+    sizer.add(this.add.image(0, 0, "scenes.main-menu.divider-h"));
     sizer.add(this.createButtons(), { padding: { top: 20 } });
     sizer.layout();
     sizer.setAlpha(0);
