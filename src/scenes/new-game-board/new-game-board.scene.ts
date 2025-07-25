@@ -6,11 +6,13 @@ import type { Question } from "../../core/game/models/questions.model";
 import type { HudScene } from "../hud/hud.scene";
 import { GameStateManager } from "../../core/game/game-state-manager";
 import type Sizer from "phaser3-rex-plugins/templates/ui/sizer/Sizer";
+import { FPSIndicator } from "../../utils/fps";
 
 export class NewGameBoardScene extends Phaser.Scene {
   public creator: GameBoardSceneCreator;
   public services: GameBoardSceneServices;
   private stateManager?: GameStateManager;
+  private fpsIndicator?: FPSIndicator;
 
   constructor() {
     super("new-game-board");
@@ -24,6 +26,10 @@ export class NewGameBoardScene extends Phaser.Scene {
 
   create() {
     console.log("GameBoardScene create");
+    
+    // Add FPS indicator
+    this.fpsIndicator = new FPSIndicator(this);
+    
     this.creator.setup();
     this.services.setup();
 
@@ -115,5 +121,12 @@ export class NewGameBoardScene extends Phaser.Scene {
     
     // Remove any remaining event listeners
     this.game.events.off('state-changed');
+  }
+
+  update() {
+    // Update FPS indicator
+    if (this.fpsIndicator) {
+      this.fpsIndicator.update();
+    }
   }
 }

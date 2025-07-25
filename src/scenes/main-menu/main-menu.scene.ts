@@ -1,5 +1,6 @@
 import type OverlapSizer from "phaser3-rex-plugins/templates/ui/overlapsizer/OverlapSizer";
 import { convert2DTo3D, update3DGameObject } from "../../utils/3d";
+import { FPSIndicator } from "../../utils/fps";
 
 export class MainMenuScene extends Phaser.Scene {
   // private cameraTween?: Phaser.Tweens.Tween;
@@ -8,6 +9,7 @@ export class MainMenuScene extends Phaser.Scene {
   private loading: boolean = true;
   private tabButtonIndex: number = -1;
   private tabButtons: OverlapSizer[] = [];
+  private fpsIndicator?: FPSIndicator;
 
   constructor() {
     super("main-menu");
@@ -19,6 +21,9 @@ export class MainMenuScene extends Phaser.Scene {
     // Initialize mouse position to center of screen to start cards straight at 180°
     this.mousePosition.x = width / 2;
     this.mousePosition.y = height / 2;
+    
+    // Add FPS indicator
+    this.fpsIndicator = new FPSIndicator(this);
     
     this.scene.launch("hud");
     this.scene.bringToTop("hud");
@@ -480,6 +485,11 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   update() {
+    // Update FPS indicator
+    if (this.fpsIndicator) {
+      this.fpsIndicator.update();
+    }
+    
     // Update background position based on mouse position
     const backgroundImage = this.children.getByName("background-image") as Phaser.GameObjects.Image;
     if (backgroundImage && !this.loading) {
