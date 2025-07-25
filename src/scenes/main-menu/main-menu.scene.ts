@@ -253,14 +253,6 @@ export class MainMenuScene extends Phaser.Scene {
     });
 
     perspectiveCard.on(Phaser.Input.Events.POINTER_DOWN, () => {
-      // Store the clicked button's position
-      const targetX = perspectiveCard.x;
-      const targetY = perspectiveCard.y;
-
-      // Bring clicked button to front
-      perspectiveCard.setDepth(1000);
-      perspectiveText.setDepth(1001);
-
       // Add highlight animation for clicked button
       this.tweens.add({
         targets: [perspectiveCard, perspectiveText],
@@ -270,38 +262,8 @@ export class MainMenuScene extends Phaser.Scene {
         ease: 'Power2'
       });
 
-      // Make other buttons stack on the clicked button
-      let stackDelay = 0;
-      this.buttons.forEach(btn => {
-        if (btn !== buttonObj && !btn.isLogo && btn.text) {
-          // Set lower depth for stacking effect
-          btn.card.setDepth(100);
-          btn.text.setDepth(101);
-
-          // Stack animation
-          this.tweens.add({
-            targets: [btn.card, btn.text],
-            x: targetX,
-            y: targetY,
-            scaleX: 0.95,
-            scaleY: 0.95,
-            alpha: 0.6,
-            duration: 300,
-            delay: stackDelay,
-            ease: 'Power2',
-            onComplete: () => {
-              // Return to original position
-              btn.card.setDepth(0).setAlpha(0);
-              btn.text.setDepth(0).setAlpha(0);
-            }
-          });
-          
-          stackDelay += 50; // Stagger the animations
-        }
-      });
-
       // Reset clicked button
-      this.time.delayedCall(800, () => {
+      this.time.delayedCall(400, () => {
         this.tweens.add({
           targets: [perspectiveCard, perspectiveText],
           scaleX: 1,
@@ -316,7 +278,6 @@ export class MainMenuScene extends Phaser.Scene {
         });
       });
 
-      
     });
 
     this.buttons.push(buttonObj);
