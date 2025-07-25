@@ -2,7 +2,7 @@ import type GridSizer from "phaser3-rex-plugins/templates/ui/gridsizer/GridSizer
 import { GameCore } from "../../core/game/game-core";
 import { fitToSize } from "../../utils/size";
 import type { NewGameBoardScene } from "./new-game-board.scene";
-import { InputComponent } from "../../components/input";
+// import { InputComponent } from "../../components/input";
 import { ListeningComponent } from "../../components/listening";
 
 const CATEGORIES_AND_QUESTIONS_Y_SEPARATION = 16; // Separation between the categories and the questions.

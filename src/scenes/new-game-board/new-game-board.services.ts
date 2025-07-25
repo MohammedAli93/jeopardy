@@ -323,7 +323,7 @@ export class GameBoardSceneServices {
           
           // Animate text font sizes smoothly during transition
           const progress = tween.progress;
-          fontSizeTargets.forEach((fontData, element) => {
+          fontSizeTargets.forEach((fontData, _element) => {
             if (fontData && fontData.textObj) {
               // Smoothly interpolate between current and target font size
               const currentFontSize = Math.round(
@@ -345,7 +345,7 @@ export class GameBoardSceneServices {
           mainContainer.width = originalWidth;
           
           // Set final font sizes
-          fontSizeTargets.forEach((fontData, element) => {
+          fontSizeTargets.forEach((fontData, _element) => {
             if (fontData && fontData.textObj) {
               fontData.textObj.setFontSize(fontData.to);
             }

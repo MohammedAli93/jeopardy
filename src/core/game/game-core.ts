@@ -5,7 +5,7 @@ export class GameCore {
 }
 
 // Testing purposes
-if (import.meta.env.DEV) {
+// if (import.meta.env.DEV) {
   const questions: Question[] = [
     // CAPITALS
     {
@@ -201,4 +201,4 @@ if (import.meta.env.DEV) {
   ];
 
   GameCore.questions.setQuestions(questions);
-}
+// }

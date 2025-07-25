@@ -1,8 +1,8 @@
 import { GameBoardSceneServices } from "./new-game-board.services";
 import { GameBoardSceneCreator } from "./new-game-board.creator";
-import { GameCore } from "../../core/game/game-core";
+// import { GameCore } from "../../core/game/game-core";
 import type { Question } from "../../core/game/models/questions.model";
-import { InputComponent } from "../../components/input";
+// import { InputComponent } from "../../components/input";
 import type { HudScene } from "../hud/hud.scene";
 import { GameStateManager } from "../../core/game/game-state-manager";
 import type Sizer from "phaser3-rex-plugins/templates/ui/sizer/Sizer";
