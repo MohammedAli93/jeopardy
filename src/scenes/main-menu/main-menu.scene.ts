@@ -1,10 +1,12 @@
-// import CurvedPostFX from "../../pipelines/curved-post-fx";
+import type OverlapSizer from "phaser3-rex-plugins/templates/ui/overlapsizer/OverlapSizer";
 
 export class MainMenuScene extends Phaser.Scene {
   // private cameraTween?: Phaser.Tweens.Tween;
   private buttons: any[] = [];
   private mousePosition = { x: 0, y: 0 };
   private loading: boolean = true;
+  private tabButtonIndex: number = -1;
+  private tabButtons: OverlapSizer[] = [];
 
   constructor() {
     super("main-menu");
@@ -97,6 +99,15 @@ export class MainMenuScene extends Phaser.Scene {
       this.loading = false;
       this.setupMouseTracking();
     });
+
+    this.input.keyboard?.on("keydown-TAB", (event: KeyboardEvent) => {
+      event.preventDefault();
+      this.tabButtonIndex = (this.tabButtonIndex + 1) % this.tabButtons.length;
+      const tabButton = this.tabButtons[this.tabButtonIndex];
+      const otherTabButtons = this.tabButtons.filter((tab) => tab !== tabButton);
+      tabButton.emit("focus", true);
+      otherTabButtons.forEach((tab) => tab.emit("focus", false));
+    });
   }
 
   private createButtonStack() {
@@ -105,6 +116,7 @@ export class MainMenuScene extends Phaser.Scene {
     const sizer = this.rexUI.add.sizer({
       width: buttonStack.displayWidth,
       height: buttonStack.displayHeight,
+      space: { item: 30 },
     });
     sizer.addBackground(
       buttonStack
@@ -161,7 +173,7 @@ export class MainMenuScene extends Phaser.Scene {
     tempText.destroy();
 
     // Get button dimensions from texture
-    const buttonTexture = this.textures.get("scenes.main-menu.button");
+    const buttonTexture = this.textures.get("scenes.main-menu.button-enabled");
     const buttonWidth = buttonTexture.source[0].width;
     const buttonHeight = buttonTexture.source[0].height;
 
@@ -172,10 +184,10 @@ export class MainMenuScene extends Phaser.Scene {
       width: buttonWidth,
       height: buttonHeight,
       front: {
-        key: "scenes.main-menu.button"
+        key: "scenes.main-menu.button-enabled"
       },
       back: {
-        key: "scenes.main-menu.button"
+        key: "scenes.main-menu.button-enabled"
       }
     });
 
@@ -219,6 +231,7 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Add original hover/out/click functionality with perspective animation
     perspectiveCard.on(Phaser.Input.Events.POINTER_OVER, () => {
+      this.tabButtons.forEach((tab) => tab.emit("focus", false));
       buttonObj.isHovered = true;
       // Just change text color and add scale effect for hover feedback
       perspectiveCard.backFace.setTexture("scenes.main-menu.button-hover");
@@ -237,7 +250,7 @@ export class MainMenuScene extends Phaser.Scene {
     perspectiveCard.on(Phaser.Input.Events.POINTER_OUT, () => {
       buttonObj.isHovered = false;
       // Reset text color and scale
-      perspectiveCard.backFace.setTexture("scenes.main-menu.button");
+      perspectiveCard.backFace.setTexture("scenes.main-menu.button-enabled");
       perspectiveText.backFace.setTexture(text);
       this.tweens.add({
         targets: [perspectiveCard, perspectiveText],
@@ -252,29 +265,36 @@ export class MainMenuScene extends Phaser.Scene {
       buttonObj.targetRotationY = 0;
     });
 
-    perspectiveCard.on(Phaser.Input.Events.POINTER_DOWN, () => {
+    perspectiveCard.on(Phaser.Input.Events.POINTER_DOWN, async () => {
+      perspectiveCard.backFace.setTexture("scenes.main-menu.button-pressed");
       // Add highlight animation for clicked button
-      this.tweens.add({
-        targets: [perspectiveCard, perspectiveText],
-        scaleX: 1.1,
-        scaleY: 1.1,
-        duration: 200,
-        ease: 'Power2'
-      });
+      await new Promise((resolve) =>
+        this.tweens.add({
+          targets: [perspectiveCard, perspectiveText],
+          duration: 200,
+          ease: "Power2",
+          yoyo: true,
+          onComplete: resolve,
+          props: {
+            scale: 0.85,
+          },
+        })
+      );
 
       // Reset clicked button
       this.time.delayedCall(400, () => {
         this.tweens.add({
           targets: [perspectiveCard, perspectiveText],
-          scaleX: 1,
-          scaleY: 1,
           duration: 200,
-          ease: 'Power2',
+          ease: "Power2",
           onComplete: () => {
             perspectiveCard.setDepth(0);
             perspectiveText.setDepth(1);
             if (callback) callback();
-          }
+          },
+          props: {
+            scale: 1,
+          },
         });
       });
 
@@ -293,13 +313,21 @@ export class MainMenuScene extends Phaser.Scene {
     sizer.add(perspectiveText, {
       align: "center",
       expand: false,
-      offsetY: -10,
     });
 
     // Store reference to update position later for mouse tracking
     sizer.on('sizer.postlayout', () => {
       buttonObj.x = sizer.x;
       buttonObj.y = sizer.y;
+    });
+
+    this.tabButtons.push(sizer);
+    sizer.on("focus", (value: boolean) => {
+      if (value) {
+        perspectiveCard.backFace.setTexture("scenes.main-menu.button-focus");
+      } else {
+        perspectiveCard.backFace.setTexture("scenes.main-menu.button-enabled");
+      }
     });
 
     return sizer;

@@ -29,8 +29,11 @@ export class LoadingScene extends Phaser.Scene {
     this.load.image("logo", "logo.webp");
     this.load.image("logo-header", "logo-header.webp");
     this.load.image("button-stack", "button-stack.webp");
-    this.load.image("button", "button.png");
-    this.load.image("button-hover", "button-hover.png");
+    this.load.image("button-disabled", "button/button-disabled.webp");
+    this.load.image("button-enabled", "button/button-enabled.webp");
+    this.load.image("button-focus", "button/button-focus.webp");
+    this.load.image("button-hover", "button/button-hover.webp");
+    this.load.image("button-pressed", "button/button-pressed.webp");
     this.load.image("divider-h", "divider-h.png");
     this.load.image("button-settings", "button-settings.webp");
     this.load.image("button-saves", "button-saves.webp");
