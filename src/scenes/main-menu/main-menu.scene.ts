@@ -32,14 +32,12 @@ export class MainMenuScene extends Phaser.Scene {
 
     // Add background to tracking
     // Title Background
-    // const titleBackground = this.add.image(
-    //   width / 2,
-    //   height / 2,
-    //   "scenes.main-menu.title-background"
-    // );
-    // titleBackground.setAlpha(0).setName("title-background");
-    const titleBackground = this.createTitleBackground();
-    titleBackground.setAlpha(0);
+    const titleBackground = this.add.image(
+      width / 2,
+      height / 2,
+      "scenes.main-menu.title-background"
+    );
+    titleBackground.setAlpha(0).setName("title-background");
 
     const sizer = this.rexUI.add.sizer({
       orientation: "vertical",
@@ -49,9 +47,10 @@ export class MainMenuScene extends Phaser.Scene {
     });
 
     // Title - Create perspective logo
+    sizer.add(this.add.image(0, 0, "scenes.main-menu.logo-header"));
     const title = this.createPerspectiveLogo();
 
-    // sizer.add(titleBackground);
+    sizer.addBackground(titleBackground);
     sizer.add(title);
     sizer.add(this.createButtonStack());
     // sizer.add(this.add.image(0, 0, "scenes.main-menu.divider-h"));
@@ -101,35 +100,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private createButtonStack() {
-    // const buttonStack = this.add.image(0, 0, "scenes.main-menu.button-stack");
-    const buttonStack = this.add.rexPerspectiveCard({
-      x: 0,
-      y: 0,
-      front: {
-        key: "scenes.main-menu.button-stack"
-      },
-      back: {
-        key: "scenes.main-menu.button-stack"
-      }
-    });
-
-    buttonStack.rotateY = Phaser.Math.DegToRad(180);
-
-    const buttonStackObj = {
-      card: buttonStack,
-      width: buttonStack.width,
-      height: buttonStack.height,
-      isHovered: false,
-      targetRotationX: 0,
-      targetRotationY: 0,
-      currentRotationX: 0,
-      currentRotationY: 0,
-      baseAngleY: 180,
-      isButtonStack: true,
-      x: 0, // Will be set when positioned
-    };
-
-    this.buttons.push(buttonStackObj);
+    const buttonStack = this.add.image(0, 0, "scenes.main-menu.button-stack");
 
     const sizer = this.rexUI.add.sizer({
       width: buttonStack.displayWidth,
@@ -416,44 +387,6 @@ export class MainMenuScene extends Phaser.Scene {
     this.buttons.push(logoObj);
 
     return perspectiveLogo;
-  }
-
-  private createTitleBackground() {
-    const backgroundTexture = this.textures.get("scenes.main-menu.title-background");
-    const backgroundWidth = backgroundTexture.source[0].width;
-    const backgroundHeight = backgroundTexture.source[0].height;
-
-    const perspectiveTitleBackground = this.add.rexPerspectiveCard({
-      x: this.scale.width / 2,
-      y: this.scale.height / 2,
-      width: backgroundWidth,
-      height: backgroundHeight,
-      front: {
-        key: "scenes.main-menu.title-background"
-      },
-      back: {
-        key: "scenes.main-menu.title-background"
-      }
-    }).setName("title-background");
-
-    perspectiveTitleBackground.rotateY = Phaser.Math.DegToRad(180);
-
-    const titleBackgroundObj = {
-      card: perspectiveTitleBackground,
-      width: backgroundWidth,
-      height: backgroundHeight,
-      isHovered: false,
-      targetRotationX: 0,
-      targetRotationY: 0,
-      currentRotationX: 0,
-      currentRotationY: 0,
-      baseAngleY: 180,
-      x: 0, // Will be set when positioned
-    };
-
-    this.buttons.push(titleBackgroundObj);
-
-    return perspectiveTitleBackground;
   }
 
   private createButtons() {
