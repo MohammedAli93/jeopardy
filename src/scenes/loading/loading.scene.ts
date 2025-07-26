@@ -22,9 +22,7 @@ export class LoadingScene extends Phaser.Scene {
     this.load.setPath("assets/scenes/main-menu");
     this.load.setPrefix("scenes.main-menu.");
 
-    // this.load.video("background-video", "background.mp4", true);
     this.load.image("background", "background.webp");
-    this.load.video("background-video", "background.mp4", true);
     this.load.image("title-background", "title-background.webp");
     this.load.image("logo", "logo.webp");
     this.load.image("logo-header", "logo-header.webp");
@@ -45,7 +43,6 @@ export class LoadingScene extends Phaser.Scene {
     this.load.setPrefix("scenes.game.");
 
     this.load.image("background", "background.png");
-    this.load.video("intro", "intro.mp4", true);
 
     // Game Board
     this.load.setPath("assets/scenes/game-board");
@@ -72,7 +69,6 @@ export class LoadingScene extends Phaser.Scene {
     this.load.image("brand-icon", "brand-icon.png");
     this.load.image("close-icon", "close-icon.png");
     this.load.image("ok-icon", "ok-icon.png");
-    this.load.video("listening-effect", "listening-effect.mp4", true);
 
     // Choose Question
     this.load.setPath("assets/scenes/choose-question");
@@ -142,9 +138,9 @@ export class LoadingScene extends Phaser.Scene {
       if (import.meta.env.DEV) {
         // this.scene.launch("hud");
         // this.scene.bringToTop("hud");
-        // this.fullLoaded.assets = false;
+        this.fullLoaded.assets = false;
         // this.scene.start("main-menu");
-        // this.scene.start("game");
+        this.scene.start("game");
         // this.scene.start("game-board");
         // this.scene.start("new-game-board");
         // this.scene.start("choose-question");

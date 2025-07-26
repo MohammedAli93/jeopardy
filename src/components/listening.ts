@@ -26,11 +26,6 @@ export class ListeningComponent {
       name: "listening-container",
     });
 
-    const effectVideo = this.scene.add.video(0, height+5, "scenes.new-game-board.listening-effect").setName("listening-effect");
-    effectVideo.setSize(width, sizerHeight);
-    effectVideo.setAlpha(0);
-    // sizer.add(effectVideo);
-    effectVideo.play(true);
     // const background = this.scene.rexUI.add.roundRectangle({
     //   radius: 0,
     //   color: 0xf1f1f1,
@@ -41,7 +36,6 @@ export class ListeningComponent {
     //   y: height - 152,
     // });
     const background = this.scene.add.image(0, 0, "scenes.new-game-board.listening-background");
-    // background.setMask(effectVideo.mask);
     // background.setAlpha(0.9);
     sizer.addBackground(background);
 
@@ -83,7 +77,6 @@ export class ListeningComponent {
     const { height } = this.scene.scale;
     const sizer = this.scene.children.getByName("listening-container") as Sizer;
     const sizerHeight = 248;
-    const effectVideo = this.scene.children.getByName("listening-effect") as Phaser.GameObjects.Image;
 
     this.animationPromise = new Promise<void>((resolve) => {
       this.scene.tweens.add({
@@ -96,7 +89,6 @@ export class ListeningComponent {
         ease: 'Power2',
         onComplete: () => {
            this.animationPromise = undefined;
-           effectVideo.setAlpha(0.2);
            resolve();
          }
       });
@@ -116,8 +108,6 @@ export class ListeningComponent {
     const { height } = this.scene.scale;
     const sizer = this.scene.children.getByName("listening-container") as Sizer;
     const sizerHeight = 248;
-    const effectVideo = this.scene.children.getByName("listening-effect") as Phaser.GameObjects.Image;
-    effectVideo.setAlpha(0);
 
     this.animationPromise = new Promise<void>((resolve) => {
       this.scene.tweens.add({

@@ -29,10 +29,10 @@ export class MainMenuScene extends Phaser.Scene {
     this.scene.bringToTop("hud");
 
     // Background with parallax scroll effect
-    // const backgroundImage = this.add.image(width / 2, height / 2, "scenes.main-menu.background")
-    const backgroundImage = this.add.video(width / 2, height / 2, "scenes.main-menu.background-video")
+    const backgroundImage = this.add.image(width / 2, height / 2, "scenes.main-menu.background")
+    // const backgroundImage = this.add.video(width / 2, height / 2, "scenes.main-menu.background-video")
     .setName("background-image");
-    backgroundImage.play(true);
+    // backgroundImage.play(true);
     backgroundImage.setScale(1.3, 1);
     // backgroundImage.setDisplaySize(width * 2, height * 1.8); // Make it wider for scrolling
     backgroundImage.setDepth(-1);
