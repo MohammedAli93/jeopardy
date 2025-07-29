@@ -2,6 +2,7 @@ import { ChooseQuestionServices } from "./choose-question.services";
 import { ChooseQuestionSceneCreator } from "./choose-question.creator";
 import { GameCore } from "../../core/game/game-core";
 import type { Question } from "../../core/game/models/questions.model";
+import { attachAutoReleaseTexturesEventToScene } from "../../utils/optimization";
 
 export class ChooseQuestionScene extends Phaser.Scene {
   public creator: ChooseQuestionSceneCreator;
@@ -17,8 +18,33 @@ export class ChooseQuestionScene extends Phaser.Scene {
     console.log("ChooseQuestionScene init");
   }
 
+  preload() {
+    // Choose Question
+    this.load.setPath("assets/scenes/choose-question");
+    this.load.setPrefix("scenes.choose-question.");
+
+    this.load.image("category-background", "category-background.png");
+    this.load.image("question-background", "question-background.png");
+    this.load.image("jeopardy-small-logo", "jeopardy-small-logo.jpg");
+    this.load.image("jeopardy-large-logo", "jeopardy-large-logo.jpg");
+    this.load.image("background", "background.jpg");
+    this.load.image("card", "card.jpg");
+    this.load.image("category-card", "category-card.webp");
+    this.load.image("category-card-hover", "category-card-hover.webp");
+    this.load.image("question-card", "question-card.webp");
+    this.load.image("question-card-hover", "question-card-hover.webp");
+
+    // Input
+    this.load.setPath("assets/components/input");
+    this.load.setPrefix("components.input.");
+
+    this.load.image("player-card", "player-card.webp");
+    this.load.image("icon-podcast", "icon-podcast.webp");
+  }
+
   create() {
     console.log("ChooseQuestionScene create");
+    attachAutoReleaseTexturesEventToScene(this, ["scenes.choose-question.", "components.input."]);
     this.creator.setup();
     this.services.setup();
     // console.log(this.services.getCategory("Capitals"));

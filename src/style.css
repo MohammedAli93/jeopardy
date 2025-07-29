@@ -46,6 +46,31 @@
     url("/fonts/IBMPlexSans-Regular.ttf") format("truetype");
 }
 
+
+    #app {
+      position: relative;
+      /* width: 100vw;
+      height: 100vh; */
+    }
+
+    #game-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      /* object-fit: cover; */
+      z-index: 0; 
+    }
+
+    canvas {
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      z-index: 1; 
+      /* pointer-events: none;  */
+    }
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

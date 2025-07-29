@@ -318,24 +318,24 @@ export class GameBoardSceneServices {
         ease: 'Power2',
         onUpdate: (tween: any) => {
           // Maintain original X position and width to prevent extending out of screen
-          mainContainer.x = originalX;
-          mainContainer.width = originalWidth;
+          // mainContainer.x = originalX;
+          // mainContainer.width = originalWidth;
           
-          // Animate text font sizes smoothly during transition
-          const progress = tween.progress;
-          fontSizeTargets.forEach((fontData, _element) => {
-            if (fontData && fontData.textObj) {
-              // Smoothly interpolate between current and target font size
-              const currentFontSize = Math.round(
-                fontData.from + (fontData.to - fontData.from) * progress
-              );
-              fontData.textObj.setFontSize(currentFontSize);
-            }
-          });
+          // // Animate text font sizes smoothly during transition
+          // const progress = tween.progress;
+          // fontSizeTargets.forEach((fontData, _element) => {
+          //   if (fontData && fontData.textObj) {
+          //     // Smoothly interpolate between current and target font size
+          //     const currentFontSize = Math.round(
+          //       fontData.from + (fontData.to - fontData.from) * progress
+          //     );
+          //     fontData.textObj.setFontSize(currentFontSize);
+          //   }
+          // });
           
           // Re-layout the main container during animation if it has layout method
           if (mainContainer && typeof mainContainer.layout === 'function') {
-            mainContainer.layout();
+            // mainContainer.layout();
           }
         },
         onComplete: () => {
@@ -353,7 +353,7 @@ export class GameBoardSceneServices {
           
           // Ensure final layout is correct
           if (mainContainer && typeof mainContainer.layout === 'function') {
-            mainContainer.layout();
+            // mainContainer.layout();
           }
           resolve();
         }

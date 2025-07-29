@@ -58,7 +58,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }]
     },
     // @ts-expect-error Ignore this error because we're using a custom pipeline.
-    pipeline: { CurvedPostFX }
+    pipeline: { CurvedPostFX },
+    transparent: true,
   };
 
   new Phaser.Game(config);

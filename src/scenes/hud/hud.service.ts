@@ -94,21 +94,23 @@ export class HudService {
     const hud = this.scene.children.getByName("hud") as Sizer;
     const originalY = height - HUB_SIZER_HEIGHT / 2;
 
-    this.animationPromise = new Promise<void>((resolve) => {
-      this.scene.tweens.add({
-        targets: hud,
-        props: {
-          alpha: { from: 0.5, to: 1 },
-          y: { from: hud.y + HUB_SIZER_HEIGHT, to: originalY},
-        },
-        duration: 500,
-        ease: 'Power2',
-        onComplete: () => {
-          this.animationPromise = undefined;
-          resolve();
-        }
-      });
-    });
+    // this.animationPromise = new Promise<void>((resolve) => {
+    //   this.scene.tweens.add({
+    //     targets: hud,
+    //     props: {
+    //       alpha: { from: 0.5, to: 1 },
+    //       y: { from: hud.y + HUB_SIZER_HEIGHT, to: originalY},
+    //     },
+    //     duration: 500,
+    //     ease: 'Power2',
+    //     onComplete: () => {
+    //       this.animationPromise = undefined;
+    //       resolve();
+    //     }
+    //   });
+    // });
+    hud.setAlpha(1);
+    hud.y = originalY;
 
     return this.animationPromise;
   }

@@ -78,21 +78,23 @@ export class ListeningComponent {
     const sizer = this.scene.children.getByName("listening-container") as Sizer;
     const sizerHeight = 248;
 
-    this.animationPromise = new Promise<void>((resolve) => {
-      this.scene.tweens.add({
-        targets: sizer,
-        props: {
-          alpha: { from: 0, to: 1 },
-          y: { from: height + sizerHeight, to: height - sizerHeight / 2 },
-        },
-        duration: 1000,
-        ease: 'Power2',
-        onComplete: () => {
-           this.animationPromise = undefined;
-           resolve();
-         }
-      });
-    });
+    // this.animationPromise = new Promise<void>((resolve) => {
+    //   this.scene.tweens.add({
+    //     targets: sizer,
+    //     props: {
+    //       alpha: { from: 0, to: 1 },
+    //       y: { from: height + sizerHeight, to: height - sizerHeight / 2 },
+    //     },
+    //     duration: 1000,
+    //     ease: 'Power2',
+    //     onComplete: () => {
+    //        this.animationPromise = undefined;
+    //        resolve();
+    //      }
+    //   });
+    // });
+    sizer.setAlpha(1);
+    sizer.y = height - sizerHeight / 2;
 
     return this.animationPromise;
   }

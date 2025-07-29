@@ -1,6 +1,7 @@
 import type OverlapSizer from "phaser3-rex-plugins/templates/ui/overlapsizer/OverlapSizer";
 import { convert2DTo3D, update3DGameObject } from "../../utils/3d";
 import { FPSIndicator } from "../../utils/fps";
+import { attachAutoReleaseTexturesEventToScene } from "../../utils/optimization";
 
 export class MainMenuScene extends Phaser.Scene {
   // private cameraTween?: Phaser.Tweens.Tween;
@@ -15,8 +16,32 @@ export class MainMenuScene extends Phaser.Scene {
     super("main-menu");
   }
 
+  preload() {
+    // Main Menu
+    this.load.setPath("assets/scenes/main-menu");
+    this.load.setPrefix("scenes.main-menu.");
+
+    this.load.image("background", "background.webp");
+    this.load.image("title-background", "title-background.webp");
+    this.load.video("background-video", "background.mp4", true);
+    this.load.image("logo", "logo.webp");
+    this.load.image("logo-header", "logo-header.webp");
+    this.load.image("button-stack", "button-stack.webp");
+    this.load.image("button-disabled", "button/button-disabled.webp");
+    this.load.image("button-enabled", "button/button-enabled.webp");
+    this.load.image("button-focus", "button/button-focus.webp");
+    this.load.image("button-hover", "button/button-hover.webp");
+    this.load.image("button-pressed", "button/button-pressed.webp");
+    this.load.image("divider-h", "divider-h.png");
+    this.load.image("button-settings", "button-settings.webp");
+    this.load.image("button-saves", "button-saves.webp");
+    this.load.image("button-guides", "button-guides.webp");
+    this.load.image("button-a11y", "button-a11y.webp");
+  }
+
   async create() {
     const { width, height } = this.scale;
+    attachAutoReleaseTexturesEventToScene(this, "scenes.main-menu.");
     
     // Initialize mouse position to center of screen to start cards straight at 180°
     this.mousePosition.x = width / 2;
@@ -25,17 +50,34 @@ export class MainMenuScene extends Phaser.Scene {
     // Add FPS indicator
     this.fpsIndicator = new FPSIndicator(this);
     
+    const video = document.getElementById('game-video') as HTMLVideoElement;
+    const gameContainer = document.getElementById(
+      "app"
+    ) as HTMLDivElement;
+    const canvasInside = gameContainer.querySelector(
+      "canvas"
+    ) as HTMLCanvasElement;
+    this.events.on(Phaser.Scenes.Events.UPDATE, () => {
+      video.style.width = canvasInside.style.width;
+      video.style.height = canvasInside.style.height;
+      video.style.marginLeft = canvasInside.style.marginLeft;
+      video.style.marginTop = canvasInside.style.marginTop;
+    });
+    
     this.scene.launch("hud");
     this.scene.bringToTop("hud");
 
     // Background with parallax scroll effect
-    const backgroundImage = this.add.image(width / 2, height / 2, "scenes.main-menu.background")
-    // const backgroundImage = this.add.video(width / 2, height / 2, "scenes.main-menu.background-video")
-    .setName("background-image");
-    // backgroundImage.play(true);
-    backgroundImage.setScale(1.3, 1);
-    // backgroundImage.setDisplaySize(width * 2, height * 1.8); // Make it wider for scrolling
-    backgroundImage.setDepth(-1);
+    // const backgroundImage = this.add.image(width / 2, height / 2, "scenes.main-menu.background")
+    // // const backgroundImage = this.add.video(width / 2, height / 2, "scenes.main-menu.background-video")
+    // .setName("background-image");
+    // // backgroundImage.play(true);
+    // // const VIDEO_WIDTH = 1280;
+    // // const VIDEO_HEIGHT = 720;
+    // // backgroundImage.setScale(Math.max(width / VIDEO_WIDTH, height / VIDEO_HEIGHT));
+    // backgroundImage.setScale(backgroundImage.scaleX * 1.3, backgroundImage.scaleY * 1);
+    // // backgroundImage.setDisplaySize(width * 2, height * 1.8); // Make it wider for scrolling
+    // backgroundImage.setDepth(-1);
 
 
     // Add background to tracking
@@ -196,18 +238,19 @@ export class MainMenuScene extends Phaser.Scene {
     }).setPadding(5);
 
     // Generate normal texture
-    if (!this.textures.exists(text)) {
+    const textTextureKey = `scenes.main-menu.${text}`;
+    if (!this.textures.exists(textTextureKey)) {
         const rt = this.make.renderTexture({ width: tempText.width, height: tempText.height }, false);
         rt.draw(tempText, 0, 0);
-        rt.saveTexture(text);
+        rt.saveTexture(textTextureKey);
     }
 
     // Generate hover texture (black text)
-    if (!this.textures.exists(`${text}-hover`)) {
+    if (!this.textures.exists(`${textTextureKey}-hover`)) {
         tempText.setColor('#000000');
         const rt = this.make.renderTexture({ width: tempText.width, height: tempText.height }, false);
         rt.draw(tempText, 0, 0);
-        rt.saveTexture(`${text}-hover`);
+        rt.saveTexture(`${textTextureKey}-hover`);
     }
 
     tempText.destroy();
@@ -231,17 +274,17 @@ export class MainMenuScene extends Phaser.Scene {
       }
     });
 
-    const textTexture = this.textures.get(text);
+    const textTexture = this.textures.get(textTextureKey);
     const perspectiveText = this.add.rexPerspectiveCard({
       x: 0,
       y: 0,
       width: textTexture.source[0].width,
       height: textTexture.source[0].height,
       front: {
-        key: text
+        key: textTextureKey
       },
       back: {
-        key: text
+        key: textTextureKey
       }
     });
 
@@ -274,7 +317,7 @@ export class MainMenuScene extends Phaser.Scene {
       this.tabButtons.forEach((tab) => tab.emit("focus", false));
       // Just change text color and add scale effect for hover feedback
       perspectiveCard.backFace.setTexture("scenes.main-menu.button-hover");
-      perspectiveText.backFace.setTexture(`${text}-hover`);
+      perspectiveText.backFace.setTexture(`${textTextureKey}-hover`);
       this.tweens.add({
         targets: [perspectiveCard, perspectiveText],
         scaleX: 1.12,
@@ -288,7 +331,7 @@ export class MainMenuScene extends Phaser.Scene {
       buttonObj.isHovered = false;
       // Reset text color and scale
       perspectiveCard.backFace.setTexture("scenes.main-menu.button-enabled");
-      perspectiveText.backFace.setTexture(text);
+      perspectiveText.backFace.setTexture(textTextureKey);
       this.tweens.add({
         targets: [perspectiveCard, perspectiveText],
         scaleX: 1,

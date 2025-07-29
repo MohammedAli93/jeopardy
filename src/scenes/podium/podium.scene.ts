@@ -1,3 +1,4 @@
+import { attachAutoReleaseTexturesEventToScene } from "../../utils/optimization";
 import { PodiumSceneCreator } from "./podium.creator";
 import { PodiumSceneServices } from "./podium.services";
 
@@ -21,8 +22,18 @@ export class PodiumScene extends Phaser.Scene {
     console.log("PodiumScene init");
   }
 
+  preload() {
+    // Podium
+    this.load.setPath("assets/scenes/podium");
+    this.load.setPrefix("scenes.podium.");
+
+    this.load.image("card", "card.webp");
+    this.load.image("timer-unit", "timer-unit.webp");
+  }
+
   create(data: PodiumSceneData) {
     console.log("PodiumScene create");
+    attachAutoReleaseTexturesEventToScene(this, "scenes.podium.");
     this.creator.setup(data);
     this.services.setup();
     this.scene.bringToTop();

@@ -7,6 +7,7 @@ import type { HudScene } from "../hud/hud.scene";
 import { GameStateManager } from "../../core/game/game-state-manager";
 import type Sizer from "phaser3-rex-plugins/templates/ui/sizer/Sizer";
 import { FPSIndicator } from "../../utils/fps";
+import { attachAutoReleaseTexturesEventToScene } from "../../utils/optimization";
 
 export class NewGameBoardScene extends Phaser.Scene {
   public creator: GameBoardSceneCreator;
@@ -21,11 +22,29 @@ export class NewGameBoardScene extends Phaser.Scene {
   }
 
   init() {
-    console.log("GameBoardScene init");
+    console.log("NewGameBoardScene init");
+  }
+
+  preload() {
+    // New Game Board
+    this.load.setPath("assets/scenes/new-game-board");
+    this.load.setPrefix("scenes.new-game-board.");
+
+    this.load.image("background", "background.png");
+    this.load.image("questions-background", "questions-background.png");
+    this.load.image("question-background", "question-background.png");
+    this.load.image("category-background", "category-background.png");
+
+    // Listening
+    this.load.image("listening-background", "listening-background.webp");
+    this.load.image("brand-icon", "brand-icon.png");
+    this.load.image("close-icon", "close-icon.png");
+    this.load.image("ok-icon", "ok-icon.png");
   }
 
   create() {
-    console.log("GameBoardScene create");
+    console.log("NewGameBoardScene create");
+    attachAutoReleaseTexturesEventToScene(this, "scenes.new-game-board.");
     
     // Add FPS indicator
     this.fpsIndicator = new FPSIndicator(this);
@@ -46,7 +65,7 @@ export class NewGameBoardScene extends Phaser.Scene {
     });
 
     // Wait for HUD to be ready, then register components with state manager
-    this.time.delayedCall(1000, () => {
+    this.time.delayedCall(2_500, () => {
       /** HUD Scene */
       this.scene.launch("hud");
       this.scene.bringToTop("hud");
