@@ -35,11 +35,11 @@ export class LoadingScene extends Phaser.Scene {
       // this.scene.start("new-game-board");
       // this.scene.start("choose-question");
       // this.scene.start("reply-question", { question: GameCore.questions.getQuestionsByCategory("Capitals")[0] });
-      this.scene.start("player-hud", { players: [
-        { number: 1, name: "Charlotte", price: 1200, wager: true },
-        { number: 3, name: "Jessica", price: 1800, isPlayer: true },
-        { number: 1, name: "Alex", price: 800, wager: true },
-      ]});
+      // this.scene.start("player-hud", { players: [
+      //   { number: 1, name: "Charlotte", price: 1200, wager: true },
+      //   { number: 3, name: "Jessica", price: 1800, isPlayer: true },
+      //   { number: 1, name: "Alex", price: 800, wager: true },
+      // ]});
     }
 
     this.tweens.add({
