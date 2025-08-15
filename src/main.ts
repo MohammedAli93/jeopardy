@@ -1,6 +1,7 @@
 import "./style.css";
 import Phaser from "phaser";
 import RexUIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
+import PerspectiveImagePlugin from 'phaser3-rex-plugins/plugins/perspectiveimage-plugin.js'
 
 // Pipelines
 import CurvedPostFX from "./pipelines/curved-post-fx";
@@ -11,10 +12,12 @@ import { MainMenuScene } from "./scenes/main-menu/main-menu.scene";
 import { HudScene } from "./scenes/hud/hud.scene";
 import { GameScene } from "./scenes/game/game.scene";
 import { GameBoardScene } from "./scenes/game-board/game-board.scene";
+import { NewGameBoardScene } from "./scenes/new-game-board/new-game-board.scene";
 import { ChooseQuestionScene } from "./scenes/choose-question/choose-question.scene";
 import { ReplyQuestionScene } from "./scenes/reply-question/reply-question.scene";
 import { ClueCardScene } from "./scenes/clue-card/clue-card.scene";
 import { PodiumScene } from "./scenes/podium/podium.scene";
+import { PlayerHudScene } from "./scenes/player-hud/player-hud.scene";
 
 document.addEventListener("DOMContentLoaded", () => {
   const config: Phaser.Types.Core.GameConfig = {
@@ -35,10 +38,12 @@ document.addEventListener("DOMContentLoaded", () => {
       HudScene,
       GameScene,
       GameBoardScene,
+      NewGameBoardScene,
       ChooseQuestionScene,
       ReplyQuestionScene,
       ClueCardScene,
       PodiumScene,
+      PlayerHudScene,
     ],
     plugins: {
       scene: [
@@ -48,9 +53,15 @@ document.addEventListener("DOMContentLoaded", () => {
           mapping: "rexUI",
         },
       ],
+      global: [{
+        key: 'rexPerspectiveImagePlugin',
+        plugin: PerspectiveImagePlugin,
+        start: true
+    }]
     },
     // @ts-expect-error Ignore this error because we're using a custom pipeline.
-    pipeline: { CurvedPostFX }
+    pipeline: { CurvedPostFX },
+    transparent: true,
   };
 
   new Phaser.Game(config);

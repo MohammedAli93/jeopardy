@@ -1,4 +1,5 @@
 import type { Question } from "../../core/game/models/questions.model";
+import { attachAutoReleaseTexturesEventToScene } from "../../utils/optimization";
 import { ClueCardSceneCreator } from "./clue-card.creator";
 import { ClueCardServices } from "./clue-card.services";
 
@@ -21,8 +22,20 @@ export class ClueCardScene extends Phaser.Scene {
     console.log("ClueCardScene init");
   }
 
+  preload() {
+    // Clue Card
+    this.load.setPath("assets/scenes/clue-card");
+    this.load.setPrefix("scenes.clue-card.");
+
+    this.load.image("background", "background.jpg");
+    this.load.image("background-white-spotlight", "background-white-spotlight.jpg");
+    this.load.image("header-background", "header-background.webp");
+    this.load.image("header-box", "header-box.webp");
+  }
+
   async create(data: ClueCardSceneData) {
     console.log("ClueCardScene create");
+    attachAutoReleaseTexturesEventToScene(this, "scenes.clue-card.");
     this.scene.stop("hud");
     this.creator.setup(data);
     await this.services.startZoomInAnimation();

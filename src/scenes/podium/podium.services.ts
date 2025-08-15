@@ -68,14 +68,14 @@ export class PodiumSceneServices {
   public startPodiumTimerUnitAnimation(podiumCard: Sizer) {
     this.scene.creator.createTimerUnitContainer(podiumCard);
 
-    const timerUnitContainer = podiumCard.getByName(
-      "timer-unit-container"
-    ) as Sizer;
+    // const timerUnitContainer = podiumCard.getByName(
+    //   "timer-unit-container"
+    // ) as Sizer;
 
     // const tweens: Promise<Phaser.Tweens.Tween>[] = [];
-    const children = timerUnitContainer.sizerChildren;
-    timerUnitAnimation(children, (child) => {
-    });
+    // const children = timerUnitContainer.sizerChildren;
+    // timerUnitAnimation(children, (_child) => {
+    // });
     // for (let i = 0; i < children.length; i++) {
     //   const timerUnit = children[i];
       
@@ -101,12 +101,12 @@ export class PodiumSceneServices {
   }
 }
 
-function timerUnitAnimation<T>(children: T[], callback?: (child: T) => Promise<void>) {
-  let startIndex = 0;
-  let endIndex = children.length - 1;
-  while (startIndex != endIndex) {
-    const child = children[startIndex];
-    startIndex++;
-    endIndex--;
-  }
-}
+// function timerUnitAnimation<T>(children: T[], callback?: (child: T) => Promise<void>) {
+//   let startIndex = 0;
+//   let endIndex = children.length - 1;
+//   while (startIndex != endIndex) {
+//     const child = children[startIndex];
+//     startIndex++;
+//     endIndex--;
+//   }
+// }

@@ -15,7 +15,12 @@
     <span style="font-family:'ReenieBeanie-Regular'; position: absolute; left: -100%; top: -100%; z-index: -9999;">.</span>
     <span style="font-family:'IBMPlexSans-Regular'; position: absolute; left: -100%; top: -100%; z-index: -9999;">.</span>
 
-    <div id="app"></div>
+    <div id="app">
+      <video id="game-video" playsinline autoplay muted loop>
+        <source src="/assets/scenes/main-menu/background.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
