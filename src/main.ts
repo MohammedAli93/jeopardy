@@ -17,6 +17,7 @@ import { ChooseQuestionScene } from "./scenes/choose-question/choose-question.sc
 import { ReplyQuestionScene } from "./scenes/reply-question/reply-question.scene";
 import { ClueCardScene } from "./scenes/clue-card/clue-card.scene";
 import { PodiumScene } from "./scenes/podium/podium.scene";
+import { PlayerHudScene } from "./scenes/player-hud/player-hud.scene";
 
 document.addEventListener("DOMContentLoaded", () => {
   const config: Phaser.Types.Core.GameConfig = {
@@ -42,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
       ReplyQuestionScene,
       ClueCardScene,
       PodiumScene,
+      PlayerHudScene,
     ],
     plugins: {
       scene: [
